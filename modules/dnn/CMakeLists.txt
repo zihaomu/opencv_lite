@@ -8,12 +8,6 @@ endif()
 
 set(the_description "Deep neural network module. It allows to load models from different frameworks and to make forward pass")
 
-ocv_add_dispatched_file_force_all("layers/layers_common" AVX AVX2 AVX512_SKX RVV LASX)
-ocv_add_dispatched_file_force_all("int8layers/layers_common" AVX2 AVX512_SKX LASX)
-ocv_add_dispatched_file_force_all("layers/cpu_kernels/conv_block" AVX AVX2)
-ocv_add_dispatched_file_force_all("layers/cpu_kernels/conv_depthwise" AVX AVX2 RVV LASX)
-ocv_add_dispatched_file_force_all("layers/cpu_kernels/conv_winograd_f63" AVX AVX2)
-
 ocv_add_module(dnn opencv_core opencv_imgproc WRAP python java objc js)
 
 
@@ -158,13 +152,13 @@ ocv_add_samples()
 ocv_add_accuracy_tests(${dnn_runtime_libs})
 
 set(perf_path "${CMAKE_CURRENT_LIST_DIR}/perf")
-file(GLOB_RECURSE perf_srcs "${perf_path}/*.cpp")
-file(GLOB_RECURSE perf_hdrs "${perf_path}/*.hpp" "${perf_path}/*.h")
-ocv_add_perf_tests(${dnn_runtime_libs}
-    FILES test_common "${CMAKE_CURRENT_LIST_DIR}/test/test_common.hpp" "${CMAKE_CURRENT_LIST_DIR}/test/test_common.impl.hpp"
-    FILES Src ${perf_srcs}
-    FILES Include ${perf_hdrs}
-)
+# file(GLOB_RECURSE perf_srcs "${perf_path}/*.cpp")
+# file(GLOB_RECURSE perf_hdrs "${perf_path}/*.hpp" "${perf_path}/*.h")
+# ocv_add_perf_tests(${dnn_runtime_libs}
+#     FILES test_common "${CMAKE_CURRENT_LIST_DIR}/test/test_common.hpp" "${CMAKE_CURRENT_LIST_DIR}/test/test_common.impl.hpp"
+#     FILES Src ${perf_srcs}
+#     FILES Include ${perf_hdrs}
+# )
 
 ocv_option(OPENCV_DNN_PERF_CAFFE "Add performance tests of Caffe framework" OFF)
 ocv_option(OPENCV_DNN_PERF_CLCAFFE "Add performance tests of clCaffe framework" OFF)

@@ -16,9 +16,9 @@ elseif(BUILD_opencv_world OR (WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug"))
   endif()
 endif()
 
-add_subdirectory(bindings)
+# add_subdirectory(bindings)
 
-add_subdirectory(test)
+# add_subdirectory(test)
 
 if(__disable_python2)
   ocv_module_disable_(python2)

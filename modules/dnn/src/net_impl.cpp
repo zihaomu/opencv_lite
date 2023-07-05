@@ -185,7 +185,12 @@ void Net::Impl::setNumThreads(int num)
 void Net::Impl::readNet(const String& model)
 {
     env = Ort::Env(OrtLoggingLevel::ORT_LOGGING_LEVEL_WARNING, instanceName.c_str());
+#ifdef _WIN32
+    std::wstring wModel_path(model.begin(), model.end());
+    session = Ort::Session(env, wModel_path.c_str(), sessionOptions);
+#else
     session = Ort::Session(env, model.c_str(), sessionOptions);
+#endif
 
     inputCount = session.GetInputCount();
     outputCount = session.GetOutputCount();
