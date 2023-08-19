@@ -238,7 +238,7 @@ CV__DNN_INLINE_NS_BEGIN
         */
 //        CV_WRAP void enableWinograd(bool useWinograd);
 
-        struct Impl;
+        class Impl;
         inline Impl* getImpl() const { return impl.get(); }
         inline Impl& getImplRef() const { CV_DbgAssert(impl); return *impl.get(); }
         friend class accessor::DnnNetAccessor;
@@ -301,6 +301,18 @@ CV__DNN_INLINE_NS_BEGIN
      *        in failure cases.
      */
     CV_EXPORTS_W Net readNetFromONNX(const std::vector<uchar>& buffer);
+
+    /** @brief Reads a network model .trt file.
+     *  @param trtFile path to the .trt file with text description of the network architecture.
+     *  @returns Network object that ready to do forward, throw an exception in failure cases.
+     */
+    CV_EXPORTS_W Net readNetFromTRT(const String &trtFile);
+
+    /** @brief Reads a network model from .mnn file.
+     *  @param mnnFile path to the .mnn file with text description of the network architecture.
+     *  @returns Network object that ready to do forward, throw an exception in failure cases.
+     */
+    CV_EXPORTS_W Net readNetFromMNN(const String &mnnFile);
 
     /** @brief Creates blob from .pb file.
      *  @param path to the .pb file with input tensor.

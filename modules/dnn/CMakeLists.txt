@@ -17,6 +17,10 @@ if(WITH_ORT AND HAVE_ORT)
   ocv_target_compile_definitions(${the_module} PRIVATE "HAVE_ORT=1")
 endif()
 
+if(WITH_MNN AND HAVE_MNN)
+  ocv_target_compile_definitions(${the_module} PRIVATE "HAVE_MNN=1")
+endif()
+
 ocv_cmake_hook_append(INIT_MODULE_SOURCES_opencv_dnn "${CMAKE_CURRENT_LIST_DIR}/cmake/hooks/INIT_MODULE_SOURCES_opencv_dnn.cmake")
 
 if(MSVC)
@@ -97,10 +101,22 @@ else()
   set(sources_options EXCLUDE_OPENCL)
 endif()
 
+# Include and Link ORT
 if(HAVE_ORT)
   message(STATUS "Find ONNXRuntime, and add it to dnn.")
+  message(STATUS "ORT_SDK_INC : ${ORT_SDK_INC}")
+  message(STATUS "ORT_SDK_LIB : ${ORT_SDK_LIB}")
   list(APPEND include_dirs ${ORT_SDK_INC})
   list(APPEND libs ${ORT_SDK_LIB})
+endif()
+
+# Include and line MNN
+if(HAVE_MNN)
+  message(STATUS "Find MNN, and add it to dnn.")
+  message(STATUS "MNN_INC : ${MNN_INC}")
+  message(STATUS "MNN_LIB : ${MNN_LIB}")
+  list(APPEND include_dirs ${MNN_INC})
+  list(APPEND libs ${MNN_LIB})
 endif()
 
 ocv_module_include_directories(${include_dirs})

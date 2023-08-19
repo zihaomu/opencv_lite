@@ -11,21 +11,12 @@ namespace dnn {
 CV__DNN_INLINE_NS_BEGIN
 
 Net::Net()
-    : impl(makePtr<Net::Impl>())
 {
 }
 
 Net::~Net()
 {
 }
-
-//Mat Net::forward(const String& outputName)
-//{
-//    CV_TRACE_FUNCTION();
-//    CV_Assert(impl);
-//    CV_Assert(!empty());
-//    return impl->forward(outputName);
-//}
 
 Mat Net::forward(const String& outputName)
 {
@@ -54,31 +45,59 @@ void Net::forward(OutputArrayOfArrays outputBlobs, const std::vector<String>& ou
 std::vector<std::string> Net::getInputName()
 {
     CV_TRACE_FUNCTION();
+    CV_Assert(impl);
     return impl->getInputName();
 }
 
 std::vector<std::string> Net::getOutputName()
 {
     CV_TRACE_FUNCTION();
+    CV_Assert(impl);
     return impl->getOutputName();
 }
 
 std::vector<MatShape> Net::getInputShape()
 {
     CV_TRACE_FUNCTION();
+    CV_Assert(impl);
     return impl->getInputShape();
 }
 
 std::vector<MatShape> Net::getOutputShape()
 {
     CV_TRACE_FUNCTION();
+    CV_Assert(impl);
     return impl->getOutputShape();
 }
 
-void Net::readNet(const String& model)
+void Net::readNet(const String& _model)
 {
     CV_TRACE_FUNCTION();
-    CV_Assert(!model.empty());
+    CV_Assert(!_model.empty());
+    String model = _model;
+    const std::string modelExt = model.substr(model.rfind('.') + 1);
+
+    // TODO, to do, let TensorRT load ONNX model!
+#ifdef HAVE_ORT
+    if (modelExt == "onnx")
+    {
+        impl = makePtr<ImplORT>();
+    }
+#endif
+#ifdef HAVE_TRT
+    else if (modelExt == "trt")
+    {
+        impl = makePtr<ImplTensorRT>();
+    }
+#endif
+#ifdef HAVE_MNN
+    else if (modelExt == "mnn")
+    {
+        impl = makePtr<ImplMNN>();
+    }
+#endif
+    CV_Assert(impl && "Net::impl is empty! Please make sure the you have compiled OpenCV_lite with ONNXRuntime or MNN or TensorRT!");
+
     return impl->readNet(model);
 }
 
@@ -136,6 +155,7 @@ void Net::setInput(InputArray blob, const String& name)
     return impl->setInput(blob, name);
 }
 
+// TODO replace the following code with useful API.
 // FIXIT return old value or add get method
 //void Net::enableFusion(bool fusion)
 //{

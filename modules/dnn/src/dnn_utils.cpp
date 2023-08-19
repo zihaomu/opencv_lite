@@ -179,16 +179,34 @@ static inline void printData(T* data, const int len)
     }
 }
 
+template<>
+static inline void printData(uint8_t * data, const int len)
+{
+    for (int i = 0; i < len; i++)
+    {
+        std::cout << (int)*(data + i) << ", ";
+    }
+}
+
+template<>
+static inline void printData(int8_t * data, const int len)
+{
+    for (int i = 0; i < len; i++)
+    {
+        std::cout << (int)*(data + i) << ", ";
+    }
+}
+
 // TODO: print data like numpy.
 void printMatData(InputArray blob_, int printLen)
 {
     Mat blob = blob_.getMat();
-    std::cout<<"blob shape = ";
+    std::cout<<"Mat shape = ";
     auto shapeData = shape(blob);
     auto typeData = blob.type();
     printMatShape(blob);
 
-    std::cout<<"blob data = ";
+    std::cout<<"Mat data = ";
     if (blob.total() == 0)
     {
         std::cout<<"empty.";
@@ -199,7 +217,7 @@ void printMatData(InputArray blob_, int printLen)
     if (len == -1)
         len = int(blob.total());
 
-    switch (typeData)
+    switch (CV_MAT_DEPTH(typeData))
     {
         case CV_8U:
         {

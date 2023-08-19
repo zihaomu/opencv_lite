@@ -1195,6 +1195,7 @@ int MatSize::dims() const CV_NOEXCEPT
 inline
 Size MatSize::operator()() const
 {
+    if (!(dims() <= 2))
     CV_DbgAssert(dims() <= 2);
     return Size(p[1], p[0]);
 }

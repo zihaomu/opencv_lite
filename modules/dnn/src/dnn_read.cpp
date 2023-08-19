@@ -17,10 +17,20 @@ Net readNet(const String& _model)
     String model = _model;
     const std::string modelExt = model.substr(model.rfind('.') + 1);
 
+    // TODO, to do, let TensorRT load ONNX model!
     if (modelExt == "onnx")
     {
         return readNetFromONNX(model);
     }
+    else if (modelExt == "trt")
+    {
+        return readNetFromTRT(model);
+    }
+    else if (modelExt == "mnn")
+    {
+        return readNetFromMNN(model);
+    }
+
     CV_Error(Error::StsError, "Cannot determine an origin framework of files: " + model);
 }
 
@@ -31,6 +41,19 @@ Net readNetFromONNX(const String& _model)
     return net;
 }
 
+Net readNetFromTRT(const String& _model)
+{
+    Net net = Net();
+    net.readNet(_model);
+    return net;
+}
+
+Net readNetFromMNN(const String& _model)
+{
+    Net net = Net();
+    net.readNet(_model);
+    return net;
+}
 
 void releaseONNXTensor(opencv_onnx::TensorProto& tensor_proto)
 {

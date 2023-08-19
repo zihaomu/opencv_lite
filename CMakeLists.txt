@@ -217,7 +217,7 @@ OCV_OPTION(OPENCV_ENABLE_NONFREE "Enable non-free algorithms" OFF)
 
 # 3rd party libs
 OCV_OPTION(OPENCV_FORCE_3RDPARTY_BUILD   "Force using 3rdparty code from source" OFF)
-OCV_OPTION(BUILD_ZLIB               "Build zlib from source"             (WIN32 OR APPLE OR OPENCV_FORCE_3RDPARTY_BUILD) )
+OCV_OPTION(BUILD_ZLIB               "Build zlib from source"             (WIN32 OR OPENCV_FORCE_3RDPARTY_BUILD) )
 OCV_OPTION(BUILD_TIFF               "Build libtiff from source"          (WIN32 OR ANDROID OR APPLE OR OPENCV_FORCE_3RDPARTY_BUILD) )
 OCV_OPTION(BUILD_OPENJPEG           "Build OpenJPEG from source"         (WIN32 OR ANDROID OR APPLE OR OPENCV_FORCE_3RDPARTY_BUILD) )
 OCV_OPTION(BUILD_JASPER             "Build libjasper from source"        (WIN32 OR ANDROID OR APPLE OR OPENCV_FORCE_3RDPARTY_BUILD) )
@@ -293,16 +293,16 @@ OCV_OPTION(WITH_IPP "Include Intel IPP support" (NOT MINGW AND NOT CV_DISABLE_OP
 OCV_OPTION(WITH_HALIDE "Include Halide support" OFF
   VISIBLE_IF TRUE
   VERIFY HAVE_HALIDE)
-OCV_OPTION(WITH_VULKAN "Include Vulkan support" OFF
-  VISIBLE_IF TRUE
-  VERIFY HAVE_VULKAN)
+#OCV_OPTION(WITH_VULKAN "Include Vulkan support" OFF
+#  VISIBLE_IF TRUE
+#  VERIFY HAVE_VULKAN)
 # replacement for deprecated options: WITH_INF_ENGINE, WITH_NGRAPH
-OCV_OPTION(WITH_OPENVINO "Include Intel OpenVINO toolkit support" (WITH_INF_ENGINE)
-  VISIBLE_IF TRUE
-  VERIFY TARGET ocv.3rdparty.openvino)
-OCV_OPTION(WITH_WEBNN "Include WebNN support" OFF
-  VISIBLE_IF TRUE
-  VERIFY HAVE_WEBNN)
+#OCV_OPTION(WITH_OPENVINO "Include Intel OpenVINO toolkit support" (WITH_INF_ENGINE)
+#  VISIBLE_IF TRUE
+#  VERIFY TARGET ocv.3rdparty.openvino)
+#OCV_OPTION(WITH_WEBNN "Include WebNN support" OFF
+#  VISIBLE_IF TRUE
+#  VERIFY HAVE_WEBNN)
 OCV_OPTION(WITH_JASPER "Include JPEG2K support (Jasper)" ON
   VISIBLE_IF NOT IOS
   VERIFY HAVE_JASPER)
@@ -479,6 +479,10 @@ OCV_OPTION(WITH_OBSENSOR "Include obsensor support (Orbbec RGB-D modules: Astra+
 OCV_OPTION(WITH_ORT "ONNXRuntime Backend support in dnn." ON
         VISIBLE_IF TRUE
         VERIFY HAVE_ORT)
+
+OCV_OPTION(WITH_MNN "MNN Backend support in dnn." ON
+        VISIBLE_IF TRUE
+        VERIFY HAVE_MNN)
 
 # OpenCV build components
 # ===================================================
@@ -760,17 +764,21 @@ include(cmake/OpenCVFindLibsPerf.cmake)
 include(cmake/OpenCVFindLAPACK.cmake)
 include(cmake/OpenCVFindProtobuf.cmake)
 include(cmake/OpenCVDetectFlatbuffers.cmake)
-if(WITH_TENGINE)
-  include(cmake/OpenCVFindTengine.cmake)
-endif()
-if(WITH_TIMVX)
-  include(cmake/OpenCVFindTIMVX.cmake)
-endif()
-if(WITH_CANN)
-  include(cmake/OpenCVFindCANN.cmake)
-endif()
+#if(WITH_TENGINE)
+#  include(cmake/OpenCVFindTengine.cmake)
+#endif()
+#if(WITH_TIMVX)
+#  include(cmake/OpenCVFindTIMVX.cmake)
+#endif()
+#if(WITH_CANN)
+#  include(cmake/OpenCVFindCANN.cmake)
+#endif()
 if(WITH_ORT)
   include(cmake/OpenCVDetectORT.cmake)
+endif()
+
+if(WITH_MNN)
+  include(cmake/OpenCVDetectMNN.cmake)
 endif()
 
 # ----------------------------------------------------------------------------
@@ -824,9 +832,9 @@ if(WITH_OPENCL)
 endif()
 
 # --- Halide ---
-if(WITH_HALIDE)
-  include(cmake/OpenCVDetectHalide.cmake)
-endif()
+#if(WITH_HALIDE)
+#  include(cmake/OpenCVDetectHalide.cmake)
+#endif()
 
 # --- VkCom ---
 if(WITH_VULKAN)
@@ -1674,6 +1682,15 @@ if(WITH_ORT)
   if(HAVE_ORT)
     status("    Include path"  ORT_SDK_INC THEN "${ORT_SDK_INC}" ELSE "NO")
     status("    Link libraries:" ORT_SDK_LIB THEN "${ORT_SDK_LIB}" ELSE "NO")
+  endif()
+endif()
+
+if(WITH_MNN)
+  status("")
+  status("  MNN:"     HAVE_MNN THEN "YES" ELSE "NO")
+  if(HAVE_MNN)
+    status("    MNN Include path"  MNN_INC THEN "${MNN_INC}" ELSE "NO")
+    status("    MNN Link libraries:" MNN_LIB THEN "${MNN_LIB}" ELSE "NO")
   endif()
 endif()
 
