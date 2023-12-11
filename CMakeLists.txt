@@ -139,7 +139,7 @@ endif()
 
 enable_testing()
 
-project(OpenCV CXX C)
+project(OpenCV CXX C ASM)
 
 if(MSVC)
   set(CMAKE_USE_RELATIVE_PATHS ON CACHE INTERNAL "" FORCE)
@@ -763,16 +763,7 @@ include(cmake/OpenCVFindLibsVideo.cmake)
 include(cmake/OpenCVFindLibsPerf.cmake)
 include(cmake/OpenCVFindLAPACK.cmake)
 include(cmake/OpenCVFindProtobuf.cmake)
-include(cmake/OpenCVDetectFlatbuffers.cmake)
-#if(WITH_TENGINE)
-#  include(cmake/OpenCVFindTengine.cmake)
-#endif()
-#if(WITH_TIMVX)
-#  include(cmake/OpenCVFindTIMVX.cmake)
-#endif()
-#if(WITH_CANN)
-#  include(cmake/OpenCVFindCANN.cmake)
-#endif()
+
 if(WITH_ORT)
   include(cmake/OpenCVDetectORT.cmake)
 endif()
@@ -868,10 +859,6 @@ if(WITH_QUIRC)
   add_subdirectory(3rdparty/quirc)
   set(HAVE_QUIRC TRUE)
 endif()
-
-# if(WITH_ONNX)
-#   include(cmake/FindONNX.cmake)
-# endif()
 
 # ----------------------------------------------------------------------------
 # OpenCV HAL
@@ -973,14 +960,6 @@ ocv_register_modules()
 
 # Generate targets for documentation
 add_subdirectory(doc)
-
-## various data that is used by cv libraries and/or demo applications.
-#add_subdirectory(data)
-#
-## extra applications
-#if(BUILD_opencv_apps)
-#  add_subdirectory(apps)
-#endif()
 
 # examples
 if(BUILD_EXAMPLES OR BUILD_ANDROID_EXAMPLES OR INSTALL_ANDROID_EXAMPLES OR INSTALL_PYTHON_EXAMPLES OR INSTALL_C_EXAMPLES)

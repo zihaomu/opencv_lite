@@ -6,7 +6,7 @@
 
 #include "net_impl.hpp"
 
-#if HAVE_MNN
+#ifdef HAVE_MNN
 #include "MNN/Interpreter.hpp"
 #include "MNN/Tensor.hpp"
 

@@ -48,11 +48,6 @@
 
 #include <opencv2/core.hpp>
 
-// TODO: remove this flag, it will be added by cmake script.
-#ifndef HAVE_ORT
-#define HAVE_ORT 1
-#endif
-
 #include <numeric>
 #include <memory>
 #include <algorithm>

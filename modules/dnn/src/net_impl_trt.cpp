@@ -4,7 +4,7 @@
 
 #include "precomp.hpp"
 
-#if HAVE_TRT
+#ifdef HAVE_TRT
 
 namespace cv {
 namespace dnn {

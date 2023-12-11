@@ -12,7 +12,7 @@
 
 #include <opencv2/core/utils/logger.hpp>
 
-#if HAVE_MNN
+#ifdef HAVE_MNN
 #include "MNN/Interpreter.hpp"
 #endif
 
@@ -117,7 +117,7 @@ private:
 };
 #endif
 
-#if HAVE_TRT
+#ifdef HAVE_TRT
 class ImplTensorRT : public Net::Impl
 {
 public:
@@ -132,7 +132,7 @@ private:
 };
 #endif
 
-#if HAVE_MNN
+#ifdef HAVE_MNN
 class ImplMNN : public Net::Impl
 {
 public:

@@ -3,14 +3,26 @@ set(MNN_LIB "" CACHE PATH "MNN SDK library directory.")
 
 find_library(MNN_LIB_DIR "MNN" PATHS ${MNN_LIB} NO_DEFAULT_PATH)
 set(MNN_LIB ${MNN_LIB_DIR})
-message("MNN_LIB = ${MNN_LIB}")
 
 if(MNN_LIB)
   set(MNN_FOUND 1)
-else()
-  message(STATUS "DNN MNN backend: Failed to find libmnn in ${MNN_LIB}. Turning off MNN_FOUND!")
-  message(STATUS "Please set the MNN_INC and MNN_LIB in the environment variable!")
-  set(MNN_FOUND 0)
+  message(STATUS "Found MNN from given path! MNN_LIB = ${MNN_LIB}")
+else() # try to build MNN from source code.
+
+  message(STATUS "Start to build MNN from source code...")
+  add_subdirectory("${OpenCV_SOURCE_DIR}/3rdparty/MNN")
+  message(STATUS "Finish to build MNN from source code!")
+  ocv_install_target(MNN EXPORT OpenCVModules ARCHIVE DESTINATION ${OPENCV_3P_LIB_INSTALL_PATH} COMPONENT dev)
+
+  if (TARGET MNN)
+    set(MNN_FOUND 1)
+    set(MNN_LIB MNN)
+    set(MNN_INC ${OpenCV_SOURCE_DIR}/3rdparty/MNN/include)
+    message(STATUS "Found Target MNN from source code!")
+  else()
+    set(MNN_FOUND 0)
+    message(STATUS "Not found Target MNN from source code!")
+  endif()
 endif()
 
 if(MNN_FOUND)

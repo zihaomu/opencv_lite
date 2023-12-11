@@ -59,6 +59,15 @@
 /* Vulkan support */
 #cmakedefine HAVE_VULKAN
 
+/* MNN support*/
+#cmakedefine HAVE_MNN
+
+/* ONNXRuntime support */
+#cmakedefine HAVE_ORT
+
+/* TensorRT support */
+#cmakedefine HAVE_TRT
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #cmakedefine HAVE_INTTYPES_H 1
 

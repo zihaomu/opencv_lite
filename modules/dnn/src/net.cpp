@@ -83,18 +83,21 @@ void Net::readNet(const String& _model)
     {
         impl = makePtr<ImplORT>();
     }
+    else 
 #endif
 #ifdef HAVE_TRT
-    else if (modelExt == "trt")
+    if (modelExt == "trt")
     {
         impl = makePtr<ImplTensorRT>();
     }
+    else
 #endif
 #ifdef HAVE_MNN
-    else if (modelExt == "mnn")
+    if (modelExt == "mnn")
     {
         impl = makePtr<ImplMNN>();
     }
+    else 
 #endif
     CV_Assert(impl && "Net::impl is empty! Please make sure the you have compiled OpenCV_lite with ONNXRuntime or MNN or TensorRT!");
 

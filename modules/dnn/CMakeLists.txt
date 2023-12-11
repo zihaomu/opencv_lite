@@ -17,10 +17,6 @@ if(WITH_ORT AND HAVE_ORT)
   ocv_target_compile_definitions(${the_module} PRIVATE "HAVE_ORT=1")
 endif()
 
-if(WITH_MNN AND HAVE_MNN)
-  ocv_target_compile_definitions(${the_module} PRIVATE "HAVE_MNN=1")
-endif()
-
 ocv_cmake_hook_append(INIT_MODULE_SOURCES_opencv_dnn "${CMAKE_CURRENT_LIST_DIR}/cmake/hooks/INIT_MODULE_SOURCES_opencv_dnn.cmake")
 
 if(MSVC)

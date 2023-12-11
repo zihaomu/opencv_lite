@@ -23,6 +23,7 @@ void PrintTo(const cv::dnn::Backend& v, std::ostream* os)
     switch (v) {
     case DNN_BACKEND_DEFAULT: *os << "DEFAULT"; return;
     case DNN_BACKEND_OPENCV: *os << "OCV"; return;
+    case DNN_BACKEND_CUDA: *os << "CUDA"; return;
     } // don't use "default:" to emit compiler warnings
     *os << "DNN_BACKEND_UNKNOWN(" << (int)v << ")";
 }
@@ -31,6 +32,7 @@ void PrintTo(const cv::dnn::Target& v, std::ostream* os)
 {
     switch (v) {
     case DNN_TARGET_CPU: *os << "CPU"; return;
+    case DNN_TARGET_CUDA: *os << "CUDA"; return;
     } // don't use "default:" to emit compiler warnings
     *os << "DNN_TARGET_UNKNOWN(" << (int)v << ")";
 }
