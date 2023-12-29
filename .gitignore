@@ -24,6 +24,7 @@ bin/
 build
 cmake-build-debug
 cmake-build-release
+build_back
 node_modules
 CMakeSettings.json
 xcuserdata/

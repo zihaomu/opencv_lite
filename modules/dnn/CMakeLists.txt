@@ -2,9 +2,9 @@ if(WINRT)
   ocv_module_disable(dnn)
 endif()
 
-if(NOT HAVE_PROTOBUF)
-  ocv_module_disable(opencv_dnn)
-endif()
+# if(NOT HAVE_PROTOBUF)
+#   ocv_module_disable(opencv_dnn)
+# endif()
 
 set(the_description "Deep neural network module. It allows to load models from different frameworks and to make forward pass")
 

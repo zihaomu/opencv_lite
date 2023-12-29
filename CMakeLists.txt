@@ -13,7 +13,7 @@ FATAL: In-source builds are not allowed.
        You should create a separate directory for build files.
 ")
 endif()
-
+# set(CMAKE_BUILD_TYPE "Release")
 
 include(cmake/OpenCVMinDepVersions.cmake)
 
@@ -818,9 +818,9 @@ else()
 endif()
 
 # --- OpenCL ---
-if(WITH_OPENCL)
-  include(cmake/OpenCVDetectOpenCL.cmake)
-endif()
+# if(WITH_OPENCL)
+#   include(cmake/OpenCVDetectOpenCL.cmake)
+# endif()
 
 # --- Halide ---
 #if(WITH_HALIDE)
@@ -828,9 +828,9 @@ endif()
 #endif()
 
 # --- VkCom ---
-if(WITH_VULKAN)
-  include(cmake/OpenCVDetectVulkan.cmake)
-endif()
+# if(WITH_VULKAN)
+#   include(cmake/OpenCVDetectVulkan.cmake)
+# endif()
 
 # --- WebNN ---
 if(WITH_WEBNN)
@@ -966,9 +966,9 @@ if(BUILD_EXAMPLES OR BUILD_ANDROID_EXAMPLES OR INSTALL_ANDROID_EXAMPLES OR INSTA
   add_subdirectory(samples)
 endif()
 
-if(ANDROID)
-  add_subdirectory(platforms/android/service)
-endif()
+# if(ANDROID)
+#   add_subdirectory(platforms/android/service)
+# endif()
 
 # ----------------------------------------------------------------------------
 # Finalization: generate configuration-based files
@@ -985,7 +985,7 @@ if(OPENCV_GENERATE_PKGCONFIG)
 endif()
 
 # Generate OpenCV.mk for ndk-build (Android build tool)
-include(cmake/OpenCVGenAndroidMK.cmake)
+# include(cmake/OpenCVGenAndroidMK.cmake)
 
 # Generate OpenCVConfig.cmake and OpenCVConfig-version.cmake for cmake projects
 include(cmake/OpenCVGenConfig.cmake)

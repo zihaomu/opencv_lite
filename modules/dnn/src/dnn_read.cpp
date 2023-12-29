@@ -78,7 +78,8 @@ void convertBoolToInt8(const bool* src, int8_t* dst, int size)
         dst[i] = saturate_cast<int8_t>(src[i]);
     }
 }
-
+// This function needs protobuffer supported.
+// TODO! Add macro to protected this function.
 Mat getMatFromTensor(const opencv_onnx::TensorProto& tensor_proto)
 {
     const char* raw_data = tensor_proto.raw_data().c_str();
