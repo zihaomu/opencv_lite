@@ -48,6 +48,15 @@ void ImplMNN::parseTensorInfoFromSession()
     }
 }
 
+void ImplMNN::readNet(const char *buffer, size_t sizeBuffer)
+{
+    netPtr = MNN::Interpreter::createFromBuffer(buffer, sizeBuffer);
+    session = netPtr->createSession(config);
+
+    // get the tensor info from session!
+    parseTensorInfoFromSession();
+}
+
 void ImplMNN::readNet(const cv::String &model)
 {
     netPtr = MNN::Interpreter::createFromFile(model.c_str());

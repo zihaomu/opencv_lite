@@ -48,6 +48,13 @@ Net readNetFromTRT(const String& _model)
     return net;
 }
 
+Net readNetFromMNN(const char* buffer, size_t sizeBuffer)
+{
+    Net net = Net();
+    net.readNet("mnn", buffer, sizeBuffer);
+    return net;
+}
+
 Net readNetFromMNN(const String& _model)
 {
     Net net = Net();

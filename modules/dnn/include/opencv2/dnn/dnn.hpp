@@ -169,6 +169,17 @@ CV__DNN_INLINE_NS_BEGIN
          */
         CV_WRAP void readNet(const String& model);
 
+        /** @brief Load model params from the in-memory buffer to this net.
+         *  @param framework Explicit framework name tag to determine a format.
+         *  The following are supported name tags:
+         *  "onnx", need ONNXRuntime backend.
+         *  "mnn", need MNN backend.
+         *  "trt", need TensorRT backend.
+         *  @param buffer buffer memory address of the first byte of the buffer.
+         *  @param sizeBuffer size of the buffer.
+         */
+        CV_WRAP void readNet(const char* framework, const char* buffer, size_t sizeBuffer);
+
         /**
          * @brief Ask network to use specific computation backend where it supported.
          * @param[in] backendId backend identifier.
@@ -267,17 +278,17 @@ CV__DNN_INLINE_NS_BEGIN
       */
      CV_EXPORTS_W Net readNet(const String& model);
 
-     /**
-      * @brief Read deep learning network represented in one of the supported formats.
-      * @details This is an overloaded member function, provided for convenience.
-      *          It differs from the above function only in what argument(s) it accepts.
-      * @param[in] framework    Name of origin framework.
-      * @param[in] bufferModel  A buffer with a content of binary file with weights
-      * @param[in] bufferConfig A buffer with a content of text file contains network configuration.
-      * @returns Net object.
-      */
-     CV_EXPORTS_W Net readNet(const String& framework, const std::vector<uchar>& bufferModel,
-                              const std::vector<uchar>& bufferConfig = std::vector<uchar>());
+//     /**
+//      * @brief Read deep learning network represented in one of the supported formats.
+//      * @details This is an overloaded member function, provided for convenience.
+//      *          It differs from the above function only in what argument(s) it accepts.
+//      * @param[in] framework    Name of origin framework.
+//      * @param[in] bufferModel  A buffer with a content of binary file with weights
+//      * @param[in] bufferConfig A buffer with a content of text file contains network configuration.
+//      * @returns Net object.
+//      */
+//     CV_EXPORTS_W Net readNet(const String& framework, const std::vector<uchar>& bufferModel,
+//                              const std::vector<uchar>& bufferConfig = std::vector<uchar>());
 
     /** @brief Reads a network model <a href="https://onnx.ai/">ONNX</a>.
      *  @param onnxFile path to the .onnx file with text description of the network architecture.
@@ -291,6 +302,7 @@ CV__DNN_INLINE_NS_BEGIN
      *  @param sizeBuffer size of the buffer.
      *  @returns Network object that ready to do forward, throw an exception
      *        in failure cases.
+     *        // TODO, current it's not supported, need add supported
      */
     CV_EXPORTS Net readNetFromONNX(const char* buffer, size_t sizeBuffer);
 
@@ -299,6 +311,7 @@ CV__DNN_INLINE_NS_BEGIN
      *  @param buffer in-memory buffer that stores the ONNX model bytes.
      *  @returns Network object that ready to do forward, throw an exception
      *        in failure cases.
+     *        // TODO, current it's not supported, need add supported
      */
     CV_EXPORTS_W Net readNetFromONNX(const std::vector<uchar>& buffer);
 
@@ -307,6 +320,13 @@ CV__DNN_INLINE_NS_BEGIN
      *  @returns Network object that ready to do forward, throw an exception in failure cases.
      */
     CV_EXPORTS_W Net readNetFromTRT(const String &trtFile);
+
+    /** @brief Reads a network model from .mnn in-memory buffer.
+     *  @param buffer memory address of the first byte of the buffer.
+     *  @param sizeBuffer size of the buffer.
+     *  @returns Network object that ready to do forward, throw an exception in failure cases.
+     */
+    CV_EXPORTS_W Net readNetFromMNN(const char* buffer, size_t sizeBuffer);
 
     /** @brief Reads a network model from .mnn file.
      *  @param mnnFile path to the .mnn file with text description of the network architecture.

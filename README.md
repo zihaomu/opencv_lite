@@ -7,7 +7,6 @@ OpenCV-lite 是一个轻量化版本的opencv，专注dnn模型部署场景。�
 
 OpenCV-lite相比于原始OpenCV的优势：裁剪掉多余模块，减少包体；引入原生ONNXRuntime推理引擎，减少ONNX模型报错；引入MNN推理引擎，最大化推理效率。
 
-ONNX算子目前的摆烂状态，使得第三方想要通过ONNX算子集去推理ONNX模型需要投入很大的人力。因为除了要支持一个个算子外，还需要支持dynamic shape和图优化。
 
 ## 
 

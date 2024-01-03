@@ -70,6 +70,34 @@ std::vector<MatShape> Net::getOutputShape()
     return impl->getOutputShape();
 }
 
+void Net::readNet(const char* _framework, const char* buffer, size_t sizeBuffer)
+{
+    CV_TRACE_FUNCTION();
+    String framework = _framework;
+#ifdef HAVE_MNN
+    if (framework == "mnn")
+    {
+        impl = makePtr<ImplMNN>();
+    } else
+#endif
+#ifdef HAVE_TRT
+    else if (framework == "onnx")
+    {
+        CV_Error(Error::StsError, "read ONNX from buffer is being developed, please contact the developer.");
+    } else
+#endif
+#ifdef HAVE_ORT
+    if (framework == "trt")
+    {
+        CV_Error(Error::StsError, "read TensorRT from buffer is being developed, please contact the developer.");
+    }
+    else
+#endif
+    CV_Error(Error::StsError, "Cannot determine an origin framework with a name " + framework);
+
+    return impl->readNet(buffer, sizeBuffer);
+}
+
 void Net::readNet(const String& _model)
 {
     CV_TRACE_FUNCTION();

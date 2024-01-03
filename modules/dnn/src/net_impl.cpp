@@ -47,6 +47,11 @@ void Net::Impl::setPreferDevice(Compute_Device device)
     CV_LOG_WARNING(NULL, "The setPrecision does nothing!");
 }
 
+void Net::Impl::readNet(const char *, size_t)
+{
+    CV_Error(Error::StsNotImplemented, "The readNet need be overrided!");
+}
+
 std::vector<std::string> Net::Impl::getInputName()
 {
     return inputNamesString;

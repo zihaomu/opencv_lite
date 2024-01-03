@@ -65,6 +65,7 @@ public:
     // According to the model name to load model with specific Impl Runner.
     // Contain the empty implementation
     virtual void readNet(const String& model) = 0;
+    virtual void readNet(const char* buffer, size_t sizeBuffer);
     virtual void setInput(InputArray blob_, const String& name) = 0;
 
     std::vector<string> getInputName();
@@ -140,6 +141,7 @@ public:
     ~ImplMNN();
     void setNumThreads(int num) override;
     void readNet(const String& model) override;
+    void readNet(const char* buffer, size_t sizeBuffer) override;
     void setInput(InputArray blob_, const String& name) override;
     void forward(OutputArrayOfArrays outputBlobs,
                  const std::vector<String>& outBlobNames) override;
