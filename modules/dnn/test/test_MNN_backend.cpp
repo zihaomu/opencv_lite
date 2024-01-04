@@ -115,7 +115,7 @@ public:
         // Close the file
         file.close();
 
-        Net net = readNetFromMNN(mnnmodel);
+        Net net = readNetFromMNN(buffer, fileSize);
 
         auto inputShapes = net.getInputShape();
         auto outputShapes = net.getOutputShape();
