@@ -24,8 +24,8 @@
 
 # /Users/mzh/work/read_project/sdk/ndk/21.2.6472646/build/cmake/android.toolchain.cmake
 # NDK_PATH="/Users/mzh/work/read_project/sdk/ndk/21.2.6472646"
-NDK_PATH="/Users/mzh/work/read_project/sdk/ndk/android-ndk-r21e"
-
+# NDK_PATH="/Users/mzh/work/read_project/sdk/ndk/android-ndk-r21e"
+NDK_PATH="/Users/mzh/Library/Android/sdk/ndk/26.1.10909125"
 # NDK_PATH="/Users/mzh/Library/Android/sdk/ndk/25.2.9519653"
 CMAKE_TOOLCHAIN_PATH="${NDK_PATH}/build/cmake/android-legacy.toolchain.cmake"
 
