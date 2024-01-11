@@ -129,7 +129,7 @@ public:
 
     void setNumThreads(int num) override;
 //    void setPreferableBackend(Backend device);        // setting computing device
-    void setPreferablePrecision(Precision precision); // setting computing accuracy
+    void setPreferablePrecision(Precision precision) override; // setting computing accuracy
     void readNet(const String& model) override;
     void readNet(const char* buffer, size_t sizeBuffer) override;
     void setInput(InputArray blob_, const String& name) override;
@@ -140,89 +140,12 @@ private:
     void parseTensorInfoFromSession();
     MNN::ScheduleConfig config;
     MNN::BackendConfig backendConfig = {};
-    MNN::Interpreter *netPtr = nullptr;
+    MNN::Interpreter* netPtr = nullptr;
     MNN::Session *session = nullptr;
-    std::vector<MNN::Tensor*> inTensorsPtr;
-    std::vector<MNN::Tensor*> outTensorsPtr;
+    std::vector<MNN::Tensor* > inTensorsPtr;
+    std::vector<MNN::Tensor* > outTensorsPtr;
 };
 #endif
-
-// NB: Implementation is divided between of multiple .cpp files
-
-// TODO, register backend.
-// run net work for specific backend.
-//struct Net::Impl2
-//{
-//    virtual ~Impl();
-//    Impl();
-//    Impl(const Impl&) = delete;
-//
-//    bool fusion;
-//    bool useWinograd;
-//
-//    virtual bool empty() const;
-////    virtual void setPreferableBackend(Net& net, int backendId);
-////    virtual void setPreferableTarget(int targetId);
-////    virtual void clear();
-//
-//    Mat forward(const String& outputName);
-//
-//    void forward(const OutputArrayOfArrays &outputBlobs, const String &outputName);
-//
-//    void forward(OutputArrayOfArrays outputBlobs,
-//                 const std::vector<String>& outBlobNames);
-//
-//    void setNumThreads(int num);
-//
-//    void readNet(const String& model);
-//    void setInput(InputArray blob_, const String& name);
-//
-//    std::vector<string> getInputName();
-//    std::vector<MatShape> getInputShape();
-//    std::vector<string> getOutputName();
-//    std::vector<MatShape> getOutputShape();
-//
-//    int thread_num = getNumThreads();
-//
-//    // ONNXRuntime info
-//    String instanceName{"opencv-dnn-inference"};
-//    int inputCount = 0;
-//    int outputCount = 0;
-//
-//    std::vector<std::string> inputNamesString; // reserve the session input name.
-//    std::vector<std::string> outputNamesString;
-//
-//    std::vector<const char*> inputNames; // for saving the setInput.
-//#ifdef HAVE_ORT
-//    std::vector<Ort::Value> inputTensors;
-//#endif
-//
-//    // To save the memory
-//    std::vector<const char*> preOutputName; // used for check if the
-//    std::vector<Mat> preOuts;
-//    std::vector<AutoBuffer<char> > buffers;
-//
-//
-//    std::vector<std::vector<int64_t> > inputInt64; // use for create Ort::Tensor
-//    std::vector<MatShape> inputMatShape;
-//    std::vector<std::vector<int64_t> > outputInt64; // use for create Ort::Tensor
-//    std::vector<MatShape> outputMatShape;           // use for create OpenCV Mat.
-//
-//#ifdef HAVE_ORT
-//    std::vector<ONNXTensorElementDataType> inDataType;
-//    std::vector<ONNXTensorElementDataType> outDataType;
-//    Ort::Env env;
-//
-//    Ort::AllocatorWithDefaultOptions allocator;
-//    // Currently, we only support the ORT CPU backend. TODO! support ORT cuda, and other backend.
-//    Ort::MemoryInfo memoryInfo = Ort::MemoryInfo::CreateCpu(
-//            OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeDefault);
-//    Ort::SessionOptions sessionOptions;// = Ort::SessionOptions{nullptr};
-//    Ort::Session session = Ort::Session{nullptr};
-//#endif
-//
-//};  // Net::Impl
-
 
 CV__DNN_INLINE_NS_END
 }}  // namespace cv::dnn

@@ -38,11 +38,11 @@ void ImplMNN::parseTensorInfoFromSession()
     outputNamesString.clear();
     outTensorsPtr.clear();
     outputMatShape.clear();
+
     for (auto iter = outputs.begin(); iter != outputs.end(); iter++)
     {
         outputNamesString.push_back(iter->first);
         outTensorsPtr.push_back(iter->second);
-
         auto shape = iter->second->shape();
         outputMatShape.push_back(shape);
     }
@@ -99,7 +99,7 @@ static inline int convertMNN2CVType(const halide_type_t& mnn_halide_type)
     return cvType;
 }
 
-static inline void tensor2Mat(const MNN::Tensor* tensor, Mat& out)
+static inline void tensor2Mat(const Ptr<MNN::Tensor> tensor, Mat& out)
 {
     // get shape,
     auto tensorShape = tensor->shape();
@@ -116,7 +116,20 @@ static inline void tensor2Mat(const MNN::Tensor* tensor, Mat& out)
         out.dims = 1;
 }
 
-static void tensors2Mats(const std::vector<MNN::Tensor*>& tensors, std::vector<Mat>& outs)
+static void tensors2Mats(const std::vector<Ptr<MNN::Tensor> >& tensors, std::vector<Mat>& outs)
+{
+    if (outs.empty() || outs.size() != tensors.size())
+        outs.resize(tensors.size());
+
+    int len = tensors.size();
+
+    for (int i = 0; i < len; i++)
+    {
+        tensor2Mat(tensors[i], outs[i]);
+    }
+}
+
+static void tensors2Mats(const std::vector<MNN::Tensor* >& tensors, std::vector<Mat>& outs)
 {
     if (outs.empty() || outs.size() != tensors.size())
         outs.resize(tensors.size());
@@ -187,6 +200,9 @@ void ImplMNN::setPreferablePrecision(Precision precision)
 
 ImplMNN::~ImplMNN()
 {
+    inTensorsPtr.clear();
+    outTensorsPtr.clear();
+
     if (netPtr)
         netPtr->releaseModel();
     if (session)
@@ -221,15 +237,16 @@ void ImplMNN::forward(cv::OutputArrayOfArrays outputBlobs, const std::vector<Str
 
     this->netPtr->runSession(this->session);
 
-    std::vector<MNN::Tensor* > outputTensors(outputNames.size(), nullptr);
+    std::vector<Ptr<MNN::Tensor> > outputTensorsHost(outputNames.size(), nullptr);
+    std::vector<MNN::Tensor* > outputTensorsTmp(outputNames.size(), nullptr); // Memory was allocated insider MNN.
     // copy all the output Tensor to Host
     for (int i = 0; i < outputCount; i++)
     {
-        outputTensors[i] = netPtr->getSessionOutput(session, outputNames[i]);
-        outputTensors[i]->copyToHostTensor(outputTensors[i]);
+        outputTensorsTmp[i] = netPtr->getSessionOutput(session, outputNames[i]);
+        outputTensorsHost[i] = MNN::Tensor::createHostTensorFromDevice(outputTensorsTmp[i], true);
     }
 
-    tensors2Mats(outputTensors, outputvec);
+    tensors2Mats(outputTensorsHost, outputvec);
 }
 
 void ImplMNN::setInput(cv::InputArray blob_, const cv::String &name)
@@ -277,7 +294,7 @@ void ImplMNN::setInput(cv::InputArray blob_, const cv::String &name)
     CV_Assert(cvType == blob.depth() && "The input Mat type is not match the MNN Tensor type!");
 
     // Create template Tensor of CAFFE data layout, and transform it to expected data layout.
-    MNN::Tensor* tmp = MNN::Tensor::create(matShape, halide_type, blob.data, MNN::Tensor::CAFFE);
+    Ptr<MNN::Tensor> tmp = MNN::Tensor::create(matShape, halide_type, blob.data, MNN::Tensor::CAFFE);
     inTensorsPtr[indexRes]->copyFromHostTensor(tmp);
 }
 
