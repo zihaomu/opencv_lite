@@ -132,6 +132,12 @@ void Net::readNet(const String& _model)
     return impl->readNet(model);
 }
 
+void Net::setPreferablePrecision(int precisionId)
+{
+    CV_TRACE_FUNCTION();
+    return impl->setPreferablePrecision((Precision)precisionId);
+}
+
 //void Net::forward(OutputArrayOfArrays outputBlobs,
 //        const std::vector<String>& outBlobNames)
 //{

@@ -36,13 +36,13 @@ void Net::Impl::setNumThreads(int num)
 }
 
 // TODO finish the implement of the Precision and device
-void Net::Impl::setPrecision(Compute_Precision precision)
+void Net::Impl::setPreferablePrecision(Precision precision)
 {
     // TOOD
     CV_LOG_WARNING(NULL, "The setPrecision does nothing!");
 }
 
-void Net::Impl::setPreferDevice(Compute_Device device)
+void Net::Impl::setPreferableBackend(Backend device)
 {
     CV_LOG_WARNING(NULL, "The setPrecision does nothing!");
 }

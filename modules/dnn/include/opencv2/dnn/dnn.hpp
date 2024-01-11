@@ -54,10 +54,6 @@
 namespace cv {
 namespace dnn {
 
-namespace accessor {
-class DnnNetAccessor;  // forward declaration
-}
-
 CV__DNN_INLINE_NS_BEGIN
 //! @addtogroup dnn
 //! @{
@@ -65,43 +61,43 @@ CV__DNN_INLINE_NS_BEGIN
     typedef std::vector<int> MatShape;
 
     /**
+     * @brief Enum of computation precision supported by model.
+     * @see Net::setPreferablePrecision
+     */
+    enum Precision
+    {
+        DNN_PRECISION_NORMAL = 0,
+        DNN_PRECISION_LOW = 1,
+        DNN_PRECISION_HIGH = 2,
+    };
+
+    /**
      * @brief Enum of computation backends supported by layers.
      * @see Net::setPreferableBackend
      */
     enum Backend
     {
-        DNN_BACKEND_DEFAULT = 0,
-        DNN_BACKEND_OPENCV,
-        DNN_BACKEND_CUDA,
+        DNN_BACKEND_OPENCV = -1, // deprecated
+        DNN_BACKEND_DEFAULT = 0, // CPU
+        DNN_BACKEND_OPENCL, // For OpenCL GPU
+        DNN_BACKEND_CUDA,   // For Nvidia GPU
     };
 
-    /**
-     * @brief Enum of target devices for computations.
-     * @see Net::setPreferableTarget
-     */
+    //! deprecated. Currently, we only use Backend as target Device.
     enum Target
     {
         DNN_TARGET_CPU = 0,
+        DNN_TARGET_OPENCL_GPU,
         DNN_TARGET_CUDA,
-        DNN_TARGET_CUDA_FP16,
     };
 
     CV_EXPORTS std::vector< std::pair<Backend, Target> > getAvailableBackends();
     CV_EXPORTS_W std::vector<Target> getAvailableTargets(dnn::Backend be);
 
-    /**
-     * @brief Enables detailed logging of the DNN model loading with CV DNN API.
-     * @param[in] isDiagnosticsMode Indicates whether diagnostic mode should be set.
-     *
-     * Diagnostic mode provides detailed logging of the model loading stage to explore
-     * potential problems (ex.: not implemented layer type).
-     *
-     * @note In diagnostic mode series of assertions will be skipped, it can lead to the
-     * expected application crash.
-     */
+    /** @deprecated */
     CV_EXPORTS void enableModelDiagnostics(bool isDiagnosticsMode);
 
-    /** @brief This class provides all data needed to initialize layer.
+    /** @brief Deprecated.This class provides all data needed to initialize layer.
      *
      * It includes dictionary with scalar params (which can be read by using Dict interface),
      * blob params #blobs and optional meta information: #name and #type of layer instance.
@@ -184,40 +180,33 @@ CV__DNN_INLINE_NS_BEGIN
          * @brief Ask network to use specific computation backend where it supported.
          * @param[in] backendId backend identifier.
          * @see Backend
-         *
-         * If OpenCV is compiled with Intel's Inference Engine library, DNN_BACKEND_DEFAULT
-         * means DNN_BACKEND_INFERENCE_ENGINE. Otherwise it equals to DNN_BACKEND_OPENCV.
          */
         CV_WRAP void setPreferableBackend(int backendId)
         {
+            // TODO! Add OpenCL and CUDA supported.
             CV_LOG_WARNING(NULL, "setPreferableBackend do nothing. Currently only supports the CPU backend, and will support the CUDA backend in the future!");
             // do nothing.
         }
 
-        /**
-         * @brief Ask network to make computations on specific target device.
-         * @param[in] targetId target identifier.
-         * @see Target
-         *
-         * List of supported combinations backend / target:
-         * |                        | DNN_BACKEND_OPENCV | DNN_BACKEND_INFERENCE_ENGINE | DNN_BACKEND_HALIDE |  DNN_BACKEND_CUDA |
-         * |------------------------|--------------------|------------------------------|--------------------|-------------------|
-         * | DNN_TARGET_CPU         |                  + |                            + |                  + |                   |
-         * | DNN_TARGET_OPENCL      |                  + |                            + |                  + |                   |
-         * | DNN_TARGET_OPENCL_FP16 |                  + |                            + |                    |                   |
-         * | DNN_TARGET_MYRIAD      |                    |                            + |                    |                   |
-         * | DNN_TARGET_FPGA        |                    |                            + |                    |                   |
-         * | DNN_TARGET_CUDA        |                    |                              |                    |                 + |
-         * | DNN_TARGET_CUDA_FP16   |                    |                              |                    |                 + |
-         * | DNN_TARGET_HDDL        |                    |                            + |                    |                   |
-         */
+        /** @deprecated use setPreferableBackend is enough!*/
         CV_WRAP void setPreferableTarget(int targetId)
         {
-            CV_LOG_WARNING(NULL, "setPreferableTarget do nothing. Currently only supports the CPU backend, and will support the CUDA backend in the future!");
+            CV_LOG_WARNING(NULL, "setPreferableTarget is deprecated on opencv lite version, use setPreferableBackend to trigger target device!");
             // do nothing
         }
 
-        CV_WRAP void setNumThreads(int num);
+        /**
+         * @brief Ask network to use specific computation precision model.
+         * @param[in] precisionId precision identifier.
+         * @see Precision
+         */
+        CV_WRAP void setPreferablePrecision(int precisionId);
+
+        /**
+         * @brief Ask network to forward model with specific number of threads.
+         * @param[in] numThread number of threads.
+         */
+        CV_WRAP void setNumThreads(int numThread);
 
         /** @brief Sets the new input value for the network
          *  @param blob        A new blob. Should have CV_32F or CV_8U depth.
@@ -252,7 +241,6 @@ CV__DNN_INLINE_NS_BEGIN
         class Impl;
         inline Impl* getImpl() const { return impl.get(); }
         inline Impl& getImplRef() const { CV_DbgAssert(impl); return *impl.get(); }
-        friend class accessor::DnnNetAccessor;
     protected:
         Ptr<Impl> impl;
     };

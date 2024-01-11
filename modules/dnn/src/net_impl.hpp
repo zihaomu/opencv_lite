@@ -27,20 +27,6 @@ CV__DNN_INLINE_NS_BEGIN
 using std::make_pair;
 using std::string;
 
-// DNN compute precision
-enum Compute_Precision
-{
-    DNN_PRECISION_LOW = 0,
-    DNN_PRECISION_NORMAL = 1,
-    DNN_PRECISION_HIGH = 2
-};
-
-enum Compute_Device
-{
-    DNN_DEVICE_CPU = 0,
-    DNN_DEVICE_GPU = 1,
-};
-
 class Net::Impl
 {
 public:
@@ -51,8 +37,9 @@ public:
     virtual bool empty() const;
 
     virtual void setNumThreads(int num);
-    virtual void setPrecision(Compute_Precision precision); // setting computing accuracy
-    virtual void setPreferDevice(Compute_Device device);    // 设置设备，紧支持GPU和CPU
+    virtual void setPreferableBackend(Backend device);        // setting computing device
+    virtual void setPreferablePrecision(Precision precision); // setting computing accuracy
+
 
     virtual Mat forward(const String& outputName);
 
@@ -139,7 +126,10 @@ class ImplMNN : public Net::Impl
 public:
     ImplMNN();
     ~ImplMNN();
+
     void setNumThreads(int num) override;
+//    void setPreferableBackend(Backend device);        // setting computing device
+    void setPreferablePrecision(Precision precision); // setting computing accuracy
     void readNet(const String& model) override;
     void readNet(const char* buffer, size_t sizeBuffer) override;
     void setInput(InputArray blob_, const String& name) override;
@@ -149,6 +139,7 @@ public:
 private:
     void parseTensorInfoFromSession();
     MNN::ScheduleConfig config;
+    MNN::BackendConfig backendConfig = {};
     MNN::Interpreter *netPtr = nullptr;
     MNN::Session *session = nullptr;
     std::vector<MNN::Tensor*> inTensorsPtr;

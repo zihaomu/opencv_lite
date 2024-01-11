@@ -66,55 +66,6 @@ void ImplMNN::readNet(const cv::String &model)
     parseTensorInfoFromSession();
 }
 
-static inline int getTypeSize(int cvType)
-{
-    int esz = 0;
-
-    switch (CV_MAT_DEPTH(cvType))
-    {
-        case CV_8U:
-        case CV_8S:
-        {
-            esz = sizeof(uint8_t);
-            break;
-        }
-        case CV_16U:
-        case CV_16S:
-        {
-            esz = sizeof(int16_t);
-            break;
-        }
-        case CV_32U:
-        case CV_32S:
-        {
-            esz = sizeof(int);
-            break;
-        }
-        case CV_32F:
-        {
-            esz = sizeof(float );
-            break;
-        }
-        case CV_64F:
-        {
-            esz = sizeof(double );
-            break;
-        }
-        case CV_64S:
-        case CV_64U:
-        {
-            esz = sizeof(int64_t);
-            break;
-        }
-        default:
-        {
-            CV_Error(CV_StsError, "Un-known OpenCV data CV type in getTypeSize()!");
-        }
-    }
-
-    return esz;
-}
-
 static inline int convertMNN2CVType(const halide_type_t& mnn_halide_type)
 {
     auto halide_code = mnn_halide_type.code;
@@ -201,6 +152,39 @@ void ImplMNN::setNumThreads(int num)
     }
 }
 
+void ImplMNN::setPreferablePrecision(Precision precision)
+{
+    if (precision == Precision::DNN_PRECISION_NORMAL)
+    {
+        return;
+    }
+    else if (precision == Precision::DNN_PRECISION_LOW)
+    {
+        backendConfig.precision = MNN::BackendConfig::PrecisionMode::Precision_Low;
+    }
+    else if (precision == Precision::DNN_PRECISION_HIGH)
+    {
+        backendConfig.precision = MNN::BackendConfig::PrecisionMode::Precision_High;
+    }
+    else
+    {
+        CV_Error(CV_StsNotImplemented, "The precision is not supported!");
+    }
+
+    config.numThread = thread_num;
+    config.type = MNN_FORWARD_CPU;
+    config.backendConfig = &backendConfig;
+
+    if (session)
+    {
+        netPtr->releaseSession(session);
+        session = netPtr->createSession(config);
+        CV_LOG_ONCE_WARNING(NULL, "MNN Backend: set compute precision success. Please make sure call setPreferablePrecision() before setInput()!");
+        // get the tensor info from session!
+        parseTensorInfoFromSession();
+    }
+}
+
 ImplMNN::~ImplMNN()
 {
     if (netPtr)
@@ -213,6 +197,7 @@ ImplMNN::ImplMNN()
 {
     config.numThread = thread_num;
     config.type = MNN_FORWARD_CPU;
+    config.backendConfig = &backendConfig;
 }
 
 void ImplMNN::forward(cv::OutputArrayOfArrays outputBlobs, const std::vector<String> &outBlobNames)

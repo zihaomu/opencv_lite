@@ -64,10 +64,15 @@ public:
         }
     }
 
-    void testMobileNet(const String& model_path, const String& input_path, int inDataType, const String& expect_path, int outDataType)
+    void testMobileNet(const String& model_path, const String& input_path, int inDataType, const String& expect_path,
+                       int outDataType, int precisionId = 0, int numThreads = 4)
     {
         String mnnmodel = _tf(model_path, required);
         Net net = readNetFromMNN(mnnmodel);
+
+        // set Thread and set precision.
+        net.setPreferablePrecision(precisionId);
+        net.setNumThreads(numThreads);
 
         auto inputShapes = net.getInputShape();
         auto outputShapes = net.getOutputShape();
@@ -215,6 +220,32 @@ TEST_P(Test_MNN_nets, MobileNetV1_Caffe)
             "MobileNet/v1/expect.txt",
             CV_32F
             );
+}
+
+TEST_P(Test_MNN_nets, MobileNetV1_Caffe_Precision_Low)
+{
+    testMobileNet(
+            "MobileNet/v1/mobilenet_v1.caffe.mnn",
+            "MobileNet/flt_input.txt",
+            CV_32F,
+            "MobileNet/v1/expect.txt",
+            CV_32F,
+            1,
+            2
+    );
+}
+
+TEST_P(Test_MNN_nets, MobileNetV1_Caffe_Precision_High)
+{
+    testMobileNet(
+            "MobileNet/v1/mobilenet_v1.caffe.mnn",
+            "MobileNet/flt_input.txt",
+            CV_32F,
+            "MobileNet/v1/expect.txt",
+            CV_32F,
+            2,
+            2
+    );
 }
 
 TEST_P(Test_MNN_nets, MobileNetV1_Caffe_binary)
