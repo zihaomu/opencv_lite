@@ -39,12 +39,18 @@ void Net::Impl::setNumThreads(int num)
 void Net::Impl::setPreferablePrecision(Precision precision)
 {
     // TOOD
-    CV_LOG_WARNING(NULL, "The setPrecision does nothing!");
+    CV_LOG_WARNING(NULL, "The setPreferablePrecision does nothing!");
+}
+
+void Net::Impl::setInputShape(const cv::String &, const cv::dnn::MatShape &)
+{
+    // TOOD
+    CV_LOG_WARNING(NULL, "The setInputShape does nothing!");
 }
 
 void Net::Impl::setPreferableBackend(Backend device)
 {
-    CV_LOG_WARNING(NULL, "The setPrecision does nothing!");
+    CV_LOG_WARNING(NULL, "The setPreferableBackend does nothing!");
 }
 
 void Net::Impl::readNet(const char *, size_t)

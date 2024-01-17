@@ -221,6 +221,10 @@ CV__DNN_INLINE_NS_BEGIN
          */
         CV_WRAP void setInput(InputArray blob, const String& name = "");
 
+        /** @brief Specify shape of network input. This function is made for changing the default input shape.
+         */
+        CV_WRAP void setInputShape(const String &inputName, const MatShape& shape);
+
         CV_WRAP std::vector<std::string> getInputName();
         CV_WRAP std::vector<std::string> getOutputName();
 

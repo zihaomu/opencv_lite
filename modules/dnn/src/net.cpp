@@ -178,6 +178,12 @@ bool Net::empty() const
     return impl->empty();
 }
 
+void Net::setInputShape(const cv::String &inputName, const cv::dnn::MatShape &shape)
+{
+    CV_Assert(impl);
+    return impl->setInputShape(inputName, shape);
+}
+
 void Net::setNumThreads(int num)
 {
     CV_Assert(impl);

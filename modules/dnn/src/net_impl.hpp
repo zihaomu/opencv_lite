@@ -39,7 +39,8 @@ public:
     virtual void setNumThreads(int num);
     virtual void setPreferableBackend(Backend device);        // setting computing device
     virtual void setPreferablePrecision(Precision precision); // setting computing accuracy
-
+    // setting input shape.
+    virtual void setInputShape(const cv::String &inputName, const cv::dnn::MatShape &shape);
 
     virtual Mat forward(const String& outputName);
 
@@ -133,6 +134,8 @@ public:
     void readNet(const String& model) override;
     void readNet(const char* buffer, size_t sizeBuffer) override;
     void setInput(InputArray blob_, const String& name) override;
+
+    void setInputShape(const cv::String &inputName, const cv::dnn::MatShape &shape) override;
     void forward(OutputArrayOfArrays outputBlobs,
                  const std::vector<String>& outBlobNames) override;
 
