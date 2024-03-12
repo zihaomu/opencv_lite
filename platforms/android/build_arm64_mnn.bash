@@ -29,7 +29,7 @@
 NDK_PATH="/Users/mzh/Library/Android/sdk/ndk/26.1.10909125"
 
 # NDK_PATH="/Users/mzh/Library/Android/sdk/ndk/25.2.9519653"
-CMAKE_TOOLCHAIN_PATH="${NDK_PATH}/build/cmake/android-legacy.toolchain.cmake"
+CMAKE_TOOLCHAIN_PATH="${NDK_PATH}/build/cmake/android.toolchain.cmake"
 
 
 cmake ../../../ \

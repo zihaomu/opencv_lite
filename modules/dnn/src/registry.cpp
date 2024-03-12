@@ -26,7 +26,7 @@ public:
 private:
     BackendRegistry()
     {
-        backends.push_back(std::make_pair(DNN_BACKEND_OPENCV, DNN_TARGET_CPU));
+        backends.push_back(std::make_pair(DNN_BACKEND_CPU, DNN_TARGET_CPU));
     }
 
     BackendsList backends;
@@ -40,7 +40,7 @@ std::vector<std::pair<Backend, Target>> getAvailableBackends()
 
 std::vector<Target> getAvailableTargets(Backend be)
 {
-    if (be == DNN_BACKEND_DEFAULT)
+    if (be == DNN_BACKEND_CPU)
         be = (Backend)getParam_DNN_BACKEND_DEFAULT();
 
     std::vector<Target> result;

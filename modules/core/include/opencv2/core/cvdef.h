@@ -490,8 +490,7 @@ Cv64suf;
    0x28442211 = 0010 1000 0100 0100 0010 0010 0001 0001 ~ array of sizeof(arr_type_elem)
    0x00004188 = 0000 0000 0000 0100 0100 0001 1000 1000
 */
-#define CV_ELEM_SIZE1(type) (CV_MAT_DEPTH(type) > 7 ? 0x00004188 >> (CV_MAT_DEPTH(type)>>3) * 4 & 15 : (0x28442211 >> CV_MAT_DEPTH(type) * 4) & 15)
-
+#define CV_ELEM_SIZE1(type) ((int)((0x4418828442211ULL >> (CV_MAT_DEPTH(type) * 4)) & 15))
 #define CV_ELEM_SIZE(type) (CV_MAT_CN(type) * CV_ELEM_SIZE1(type))
 
 #ifndef MIN

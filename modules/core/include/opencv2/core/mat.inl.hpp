@@ -3131,7 +3131,7 @@ MatExpr abs(const Mat_<_Tp>& m)
     return cv::abs((const Mat&)m);
 }
 
-
+// 这里+= 符号应该只需要一个参数才对，为什么是两个？因为这个函数不是类的成员函数，所以需要两个。
 static inline
 Mat& operator += (Mat& a, const MatExpr& b)
 {

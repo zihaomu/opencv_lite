@@ -417,7 +417,7 @@ void MatOp::multiply(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double 
     {
         Mat m1, m2;
 
-        if( isReciprocal(e1) )
+        if( isReciprocal(e1) )  // 如果e1是一个除数，可以认为e1是一个1/x的东西。也就是1/x * y = y / x这种转换。
         {
             if( isScaled(e2) )
             {

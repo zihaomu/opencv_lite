@@ -21,9 +21,9 @@ CV__DNN_INLINE_NS_BEGIN
 void PrintTo(const cv::dnn::Backend& v, std::ostream* os)
 {
     switch (v) {
-    case DNN_BACKEND_DEFAULT: *os << "DEFAULT"; return;
-    case DNN_BACKEND_OPENCV: *os << "OCV"; return;
-    case DNN_BACKEND_CUDA: *os << "CUDA"; return;
+    case DNN_BACKEND_CPU: *os << "CPU"; return;
+    case DNN_BACKEND_GPU: *os << "GPU"; return;
+//    case DNN_BACKEND_CUDA: *os << "CUDA"; return;
     } // don't use "default:" to emit compiler warnings
     *os << "DNN_BACKEND_UNKNOWN(" << (int)v << ")";
 }
@@ -32,7 +32,7 @@ void PrintTo(const cv::dnn::Target& v, std::ostream* os)
 {
     switch (v) {
     case DNN_TARGET_CPU: *os << "CPU"; return;
-    case DNN_TARGET_CUDA: *os << "CUDA"; return;
+//    case DNN_TARGET_CUDA: *os << "CUDA"; return;
     } // don't use "default:" to emit compiler warnings
     *os << "DNN_TARGET_UNKNOWN(" << (int)v << ")";
 }
@@ -63,7 +63,7 @@ testing::internal::ParamGenerator< tuple<Backend, Target> > dnnBackendsAndTarget
     // do nothing
     std::vector< tuple<Backend, Target> > targets;
     std::vector< Target > available;
-    targets.push_back(make_tuple(DNN_BACKEND_OPENCV, DNN_TARGET_CPU));
+    targets.push_back(make_tuple(DNN_BACKEND_CPU, DNN_TARGET_CPU));
     return testing::ValuesIn(targets);
 }
 
