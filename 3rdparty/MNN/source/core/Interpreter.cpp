@@ -296,7 +296,7 @@ Session* Interpreter::createMultiPathSession(const std::vector<ScheduleConfig>& 
             cacheMode = cacheMode | 1; // READ cache
         }
     }
-    // 真实的创建session
+
     auto newSession =
         std::unique_ptr<Session>(new Session(std::move(info), mNet->modes, std::move(rt)));
     if (!newSession->valid()) {

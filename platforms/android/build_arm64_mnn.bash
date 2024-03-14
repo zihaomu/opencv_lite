@@ -39,6 +39,9 @@ cmake ../../../ \
 -DCMAKE_CXX_FLAGS=-std=c++11 \
 -DANDROID_ABI="arm64-v8a" \
 -DMNN_SUPPORT_BF16=OFF \
+-DTFLITE_LIB=/Users/mzh/work/github/build/build_tflite_android_216 \
+-DTFLITE_INC=/Users/mzh/work/github/tensorflow_archive/tensorflow_216 \
+-DBUILD_PNG=ON \
 -DMNN_ARM82=ON \
 -DMNN_OPENCL=ON \
 -DANDROID_STL=c++_static \
@@ -78,4 +81,4 @@ cmake ../../../ \
 -DBUILD_SHARED_LIBS=ON
 
 
-make -j4
+make -j8

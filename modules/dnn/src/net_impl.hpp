@@ -79,7 +79,7 @@ protected:
     int inputCount = 0;
     int outputCount = 0;
     ModelType type = ModelType::DNN_TYPE_UNKNOW;
-    Backend device = Backend::DNN_BACKEND_GPU;
+    Backend device = Backend::DNN_BACKEND_CPU;
     std::vector<std::string> inputNamesString; // reserve model input name.
     std::vector<std::string> outputNamesString;
 

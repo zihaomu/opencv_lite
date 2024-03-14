@@ -164,6 +164,7 @@ public:
         String expectFile = _tf(expect_path, required);
         buildMatFromFile(expectBlob, total(outputShape), expectFile, outDataType);
 
+        net.setPreferableBackend(DNN_BACKEND_GPU);
         net.setInput(inputBlob);
         Mat outputBlob = net.forward();
 

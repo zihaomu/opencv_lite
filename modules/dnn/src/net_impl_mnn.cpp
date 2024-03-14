@@ -154,7 +154,6 @@ void ImplMNN::setNumThreads(int num)
 
     thread_num = num;
     config.numThread = thread_num;
-    config.type = MNN_FORWARD_CPU;
 
     if (session)
     {
@@ -200,8 +199,6 @@ void ImplMNN::setPreferablePrecision(Precision precision)
         CV_Error(CV_StsNotImplemented, "The precision is not supported!");
     }
 
-    config.numThread = thread_num;
-    config.type = MNN_FORWARD_CPU;
     config.backendConfig = &backendConfig;
 
     if (session)

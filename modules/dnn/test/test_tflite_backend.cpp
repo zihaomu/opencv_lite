@@ -110,6 +110,7 @@ TEST_P(Test_TFLite, max_unpooling)
     // behavior of Max Unpooling layer only.
     Net net = readNet(findDataFile("dnn/tflite/hair_segmentation.tflite", false));
 
+    net.setPreferableBackend(DNN_BACKEND_GPU);
     Mat input = imread(findDataFile("cv/shared/lena.png"));
     cvtColor(input, input, COLOR_BGR2RGBA);
     input = input.mul(Scalar(1, 1, 1, 0));
@@ -134,7 +135,6 @@ TEST_P(Test_TFLite, MobilenetV1_128_int8)
     resize(img, imgResized, Size (128, 128));
     std::vector<int> inputShape = {1, 128, 128, 3};
     Mat blob = Mat(inputShape, CV_8U, imgResized.data);
-
 
     double l1 = 0.004, lInf = 3;
     net.setInput(blob);
