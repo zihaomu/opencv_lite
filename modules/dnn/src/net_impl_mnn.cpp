@@ -17,6 +17,7 @@ namespace dnn_mnn {
 
 void ImplMNN::parseTensorInfoFromSession()
 {
+    CV_Assert(this->netPtr && this->session);
     const std::map<std::string, MNN::Tensor*> inputs = this->netPtr->getSessionInputAll(this->session);
     const std::map<std::string, MNN::Tensor*> outputs = this->netPtr->getSessionOutputAll(this->session);
 
@@ -157,7 +158,7 @@ void ImplMNN::setNumThreads(int num)
 
     if (session)
     {
-        netPtr->releaseSession(session);
+        CV_Assert(netPtr->releaseSession(session));
         session = netPtr->createSession(config);
         CV_LOG_ONCE_WARNING(NULL, "MNN Backend: set num threads success. Please make sure call setNumThreads() before setInput()!");
         // get the tensor info from session!
@@ -203,7 +204,7 @@ void ImplMNN::setPreferablePrecision(Precision precision)
 
     if (session)
     {
-        netPtr->releaseSession(session);
+        CV_Assert(netPtr->releaseSession(session));
         session = netPtr->createSession(config);
         CV_LOG_ONCE_WARNING(NULL, "MNN Backend: set compute precision success. Please make sure call setPreferablePrecision() before setInput()!");
         // get the tensor info from session!
@@ -216,10 +217,10 @@ ImplMNN::~ImplMNN()
     inTensorsPtr.clear();
     outTensorsPtr.clear();
 
-    if (netPtr)
-        netPtr->releaseModel();
     if (session)
         netPtr->releaseSession(session);
+    if (netPtr)
+        netPtr->releaseModel();
 }
 
 ImplMNN::ImplMNN()
@@ -239,9 +240,12 @@ void ImplMNN::setPreferableBackend(Backend _device)
 
     if (session)
     {
-        netPtr->releaseSession(session);
-        session = netPtr->createSession(config);
+        CV_Assert(netPtr->releaseSession(this->session));
+        this->session = netPtr->createSession(config);
+
+        // TODO remove the following warning!
         CV_LOG_ONCE_WARNING(NULL, "MNN Backend: set compute precision success. Please make sure call setPreferableBackend() before setInput()!");
+        parseTensorInfoFromSession();
     }
 }
 

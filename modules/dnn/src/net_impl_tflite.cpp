@@ -103,6 +103,7 @@ void ImplTflite::setPreferableBackend(Backend _device)
         delegate_ = TfLiteXNNPackDelegateCreate(&options);
         interpreterTF->ModifyGraphWithDelegate(delegate_);
         device = _device;
+        this->parseInOutTensor();
     }
     else
 #endif
