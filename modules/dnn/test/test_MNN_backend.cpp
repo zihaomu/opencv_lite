@@ -73,6 +73,7 @@ public:
         // set Thread and set precision.
         net.setPreferablePrecision(precisionId);
         net.setNumThreads(numThreads);
+        net.setPreferableBackend(Backend::DNN_BACKEND_GPU);
 
         auto inputShapes = net.getInputShape();
         auto outputShapes = net.getOutputShape();
@@ -164,7 +165,6 @@ public:
         String expectFile = _tf(expect_path, required);
         buildMatFromFile(expectBlob, total(outputShape), expectFile, outDataType);
 
-        net.setPreferableBackend(DNN_BACKEND_GPU);
         net.setInput(inputBlob);
         Mat outputBlob = net.forward();
 

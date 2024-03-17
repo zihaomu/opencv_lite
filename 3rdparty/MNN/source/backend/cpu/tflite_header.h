@@ -6,6 +6,7 @@
 #define MNN_TFLITE_HEADER_H
 
 #include "vector"
+#include <cstring>
 
 struct float2
 {
