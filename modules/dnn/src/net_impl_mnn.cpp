@@ -17,7 +17,8 @@ namespace dnn_mnn {
 
 void ImplMNN::parseTensorInfoFromSession()
 {
-    CV_Assert(this->netPtr && this->session);
+    CV_Assert(this->netPtr);
+    CV_Assert(this->session);
     const std::map<std::string, MNN::Tensor*> inputs = this->netPtr->getSessionInputAll(this->session);
     const std::map<std::string, MNN::Tensor*> outputs = this->netPtr->getSessionOutputAll(this->session);
 
@@ -53,6 +54,7 @@ void ImplMNN::parseTensorInfoFromSession()
 void ImplMNN::readNet(const char *buffer, size_t sizeBuffer)
 {
     netPtr = MNN::Interpreter::createFromBuffer(buffer, sizeBuffer);
+    netPtr->setCacheFile(".tempcache");
     session = netPtr->createSession(config);
 
     // get the tensor info from session!
@@ -62,6 +64,7 @@ void ImplMNN::readNet(const char *buffer, size_t sizeBuffer)
 void ImplMNN::readNet(const cv::String &model)
 {
     netPtr = MNN::Interpreter::createFromFile(model.c_str());
+    netPtr->setCacheFile(".tempcache");
     session = netPtr->createSession(config);
 
     // get the tensor info from session!
@@ -237,6 +240,11 @@ void ImplMNN::setPreferableBackend(Backend _device)
 
     device = _device;
     config.type = device == Backend::DNN_BACKEND_GPU ? MNN_FORWARD_OPENCL : MNN_FORWARD_CPU;
+
+    if (device == Backend::DNN_BACKEND_GPU)
+    {
+        config.mode = MNN_GPU_TUNING_NONE;
+    }
 
     if (session)
     {
