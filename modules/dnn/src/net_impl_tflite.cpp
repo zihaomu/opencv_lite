@@ -80,7 +80,11 @@ void ImplTflite::setPreferableBackend(Backend _device)
 #if defined(__ANDROID__)
     if (device == Backend::DNN_BACKEND_CPU && _device == Backend::DNN_BACKEND_GPU)
     {
-        delegate_ = TfLiteGpuDelegateV2Create(/*default options=*/nullptr);
+        TfLiteGpuDelegateOptionsV2 options;
+        options.is_precision_loss_allowed = 1;
+        options.inference_preference = TFLITE_GPU_INFERENCE_PREFERENCE_FAST_SINGLE_ANSWER;
+
+        delegate_ = TfLiteGpuDelegateV2Create(&options);
         if (interpreterTF->ModifyGraphWithDelegate(delegate_) != kTfLiteOk)
         {
             CV_Error(NULL, "DNN Tflite backend create GPU delegate failed!");
