@@ -32,7 +32,7 @@ bool Net::Impl::empty() const
 void Net::Impl::setNumThreads(int num)
 {
     thread_num = num;
-    CV_LOG_WARNING(NULL, "The setNumThreads does nothing!");
+    CV_LOG_WARNING(NULL, "The setThreadsNum does nothing!");
 }
 
 // TODO finish the implement of the Precision and device
@@ -48,14 +48,15 @@ void Net::Impl::setInputShape(const cv::String &, const cv::dnn::MatShape &)
     CV_LOG_WARNING(NULL, "The setInputShape does nothing!");
 }
 
-void Net::Impl::setPreferableBackend(Backend device)
+void Net::Impl::setPreferableBackend(Backend _device)
 {
+    device = _device;
     CV_LOG_WARNING(NULL, "The setPreferableBackend does nothing!");
 }
 
 void Net::Impl::readNet(const char *, size_t)
 {
-    CV_Error(Error::StsNotImplemented, "The readNet need be overrided!");
+    CV_Error(Error::StsNotImplemented, "readNet from buffer is not supported on current banckend!");
 }
 
 std::vector<std::string> Net::Impl::getInputName()
@@ -76,6 +77,21 @@ std::vector<std::string> Net::Impl::getOutputName()
 std::vector<MatShape> Net::Impl::getOutputShape()
 {
     return outputMatShape;
+}
+
+void Net::Impl::setType(ModelType _type)
+{
+    this->type = _type;
+}
+
+ModelType Net::Impl::getType()
+{
+    return type;
+}
+
+int Net::Impl::getNumThreads()
+{
+    return thread_num;
 }
 
 // TODO: Move the following function to a unified function.

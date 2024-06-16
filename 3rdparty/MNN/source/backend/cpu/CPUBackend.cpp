@@ -402,7 +402,7 @@ DataType CPUBackend::getDataType(const Tensor* tensor) {
     }
     return des->type;
 }
-
+// 这里是创建OP
 /// get execution
 Execution* CPUBackend::onCreate(const std::vector<Tensor*>& inputs, const std::vector<Tensor*>& outputs,
                                 const MNN::Op* op) {

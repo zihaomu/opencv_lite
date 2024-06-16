@@ -13,9 +13,12 @@
 namespace cv {
 namespace dnn {
 CV__DNN_INLINE_NS_BEGIN
+namespace dnn_mnn {
 
 void ImplMNN::parseTensorInfoFromSession()
 {
+    CV_Assert(this->netPtr);
+    CV_Assert(this->session);
     const std::map<std::string, MNN::Tensor*> inputs = this->netPtr->getSessionInputAll(this->session);
     const std::map<std::string, MNN::Tensor*> outputs = this->netPtr->getSessionOutputAll(this->session);
 
@@ -51,6 +54,7 @@ void ImplMNN::parseTensorInfoFromSession()
 void ImplMNN::readNet(const char *buffer, size_t sizeBuffer)
 {
     netPtr = MNN::Interpreter::createFromBuffer(buffer, sizeBuffer);
+    netPtr->setCacheFile(".tempcache");
     session = netPtr->createSession(config);
 
     // get the tensor info from session!
@@ -60,6 +64,7 @@ void ImplMNN::readNet(const char *buffer, size_t sizeBuffer)
 void ImplMNN::readNet(const cv::String &model)
 {
     netPtr = MNN::Interpreter::createFromFile(model.c_str());
+    netPtr->setCacheFile(".tempcache");
     session = netPtr->createSession(config);
 
     // get the tensor info from session!
@@ -153,11 +158,10 @@ void ImplMNN::setNumThreads(int num)
 
     thread_num = num;
     config.numThread = thread_num;
-    config.type = MNN_FORWARD_CPU;
 
     if (session)
     {
-        netPtr->releaseSession(session);
+        CV_Assert(netPtr->releaseSession(session));
         session = netPtr->createSession(config);
         CV_LOG_ONCE_WARNING(NULL, "MNN Backend: set num threads success. Please make sure call setNumThreads() before setInput()!");
         // get the tensor info from session!
@@ -174,7 +178,6 @@ void ImplMNN::setInputShape(const cv::String &inputName, const cv::dnn::MatShape
     if (iter == inputNamesString.end())
     {
         CV_Error(CV_StsError, "MNN Backend: setInputShape get wrong input name!");
-        return;
     }
 
     int indexRes = iter - inputNamesString.begin();
@@ -200,13 +203,11 @@ void ImplMNN::setPreferablePrecision(Precision precision)
         CV_Error(CV_StsNotImplemented, "The precision is not supported!");
     }
 
-    config.numThread = thread_num;
-    config.type = MNN_FORWARD_CPU;
     config.backendConfig = &backendConfig;
 
     if (session)
     {
-        netPtr->releaseSession(session);
+        CV_Assert(netPtr->releaseSession(session));
         session = netPtr->createSession(config);
         CV_LOG_ONCE_WARNING(NULL, "MNN Backend: set compute precision success. Please make sure call setPreferablePrecision() before setInput()!");
         // get the tensor info from session!
@@ -219,10 +220,10 @@ ImplMNN::~ImplMNN()
     inTensorsPtr.clear();
     outTensorsPtr.clear();
 
-    if (netPtr)
-        netPtr->releaseModel();
     if (session)
         netPtr->releaseSession(session);
+    if (netPtr)
+        netPtr->releaseModel();
 }
 
 ImplMNN::ImplMNN()
@@ -230,6 +231,30 @@ ImplMNN::ImplMNN()
     config.numThread = thread_num;
     config.type = MNN_FORWARD_CPU;
     config.backendConfig = &backendConfig;
+}
+
+void ImplMNN::setPreferableBackend(Backend _device)
+{
+    if (device == _device)
+        return;
+
+    device = _device;
+    config.type = device == Backend::DNN_BACKEND_GPU ? MNN_FORWARD_OPENCL : MNN_FORWARD_CPU;
+
+    if (device == Backend::DNN_BACKEND_GPU)
+    {
+        config.mode = MNN_GPU_TUNING_NONE;
+    }
+
+    if (session)
+    {
+        CV_Assert(netPtr->releaseSession(this->session));
+        this->session = netPtr->createSession(config);
+
+        // TODO remove the following warning!
+        CV_LOG_ONCE_WARNING(NULL, "MNN Backend: set compute precision success. Please make sure call setPreferableBackend() before setInput()!");
+        parseTensorInfoFromSession();
+    }
 }
 
 void ImplMNN::forward(cv::OutputArrayOfArrays outputBlobs, const std::vector<String> &outBlobNames)
@@ -293,7 +318,6 @@ void ImplMNN::setInput(cv::InputArray blob_, const cv::String &name)
     CV_Assert(indexRes != -1 && indexRes < inputCount && inTensorsPtr[indexRes] && "MNN Backend: indexRes error called in setInput()!");
 
     // Use MNN converter to transfer the Mat to MNN::tensor.
-//    std::vector<int> tensorShape = inTensorsPtr[indexRes]->shape();
     std::vector<int> tensorShape = inputMatShape[indexRes];
     std::vector<int> matShape = shape(blob);
     size_t totalValueT = total(tensorShape);
@@ -305,12 +329,11 @@ void ImplMNN::setInput(cv::InputArray blob_, const cv::String &name)
         {
             CV_LOG_WARNING(NULL, cv::format("The given input shape is [%d x %d x %d x %d], and the expected input shape is [%d x %d x %d x %d]", matShape[0], matShape[1], matShape[2], matShape[3], tensorShape[0], tensorShape[1], tensorShape[2], tensorShape[3]));
         }
+
         if (tensorShape.size() == 3 && matShape.size() == 3)
             CV_LOG_WARNING(NULL, cv::format("The given input shape is [%d x %d x %d], and the expected input shape is [%d x %d x %d]", matShape[0], matShape[1], matShape[2], tensorShape[0], tensorShape[1], tensorShape[2]));
         CV_Error(CV_StsError, "The input shape dose not match the expacted input shape! \n"
                               "NOTE: the setInput only accept NCHW format which can be generated by blobFromImage function.");
-
-
     }
 
     auto halide_type = inTensorsPtr[indexRes]->getType();
@@ -324,6 +347,6 @@ void ImplMNN::setInput(cv::InputArray blob_, const cv::String &name)
 }
 
 CV__DNN_INLINE_NS_END
-}}  // namespace cv::dnn
+}}}  // namespace cv::dnn::mnn
 
 #endif

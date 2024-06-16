@@ -7,6 +7,7 @@
 
 #include "test_precomp.hpp"
 #include "npy_blob.hpp"
+#include <opencv2/core/utils/logger.hpp>
 
 namespace cv
 {
@@ -80,13 +81,28 @@ Mat blobFromNPY(const std::string& path)
     ifs.read(&header[0], header.size());
 
     // Extract data type.
-    CV_Assert(getType(header) == "<f4");
-    CV_Assert(getFortranOrder(header) == "False");
-    std::vector<int> shape = getShape(header);
+    Mat blob;
+    auto npType = getType(header);
+    if (npType == "<f4")
+    {
+        CV_Assert(getFortranOrder(header) == "False");
+        std::vector<int> shape = getShape(header);
 
-    Mat blob(shape, CV_32F);
-    ifs.read((char*)blob.data, blob.total() * blob.elemSize());
-    CV_Assert((size_t)ifs.gcount() == blob.total() * blob.elemSize());
+        blob = Mat(shape, CV_32F);
+        ifs.read((char*)blob.data, blob.total() * blob.elemSize());
+        CV_Assert((size_t)ifs.gcount() == blob.total() * blob.elemSize());
+    }
+    else if (npType == "|u1")
+    {
+        CV_Assert(getFortranOrder(header) == "False");
+        std::vector<int> shape = getShape(header);
+
+        blob = Mat(shape, CV_8U);
+        ifs.read((char*)blob.data, blob.total() * blob.elemSize());
+        CV_Assert((size_t)ifs.gcount() == blob.total() * blob.elemSize());
+    }
+    else
+        CV_Error(cv::Error::Code::StsNotImplemented, "Not supported npy type!");
 
     return blob;
 }

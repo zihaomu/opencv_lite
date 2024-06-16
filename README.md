@@ -1,11 +1,13 @@
-# OpenCV-lite
+# OpenCV-lite 
+还在开发中。。。
+
 OpenCV-lite 是一个轻量化版本的opencv，专注dnn模型部署场景。主要的修改包括：
 - 移除一些不太常用的模块：features2d, flann, gapi, ml, objdetect, stitching, video.
-- 保留dnn模块API，直接使用MNN和ONNXRuntime去做相应的模型推理。
+- 保留dnn模块API，直接使用MNN、ONNXRuntime、Tflite和TensorRT去做相应的模型推理。
 
 相关项目：
 
-OpenCV-lite相比于原始OpenCV的优势：裁剪掉多余模块，减少包体；引入原生ONNXRuntime推理引擎，减少ONNX模型报错；引入MNN推理引擎，最大化推理效率。
+OpenCV-lite相比于原始OpenCV的优势：裁剪掉多余模块，减少包体；引入模型格式对应的推理引擎，让对应的推理引擎推理对应的模型结构。
 
 
 ## 

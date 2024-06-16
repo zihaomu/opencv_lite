@@ -62,6 +62,9 @@
 /* MNN support*/
 #cmakedefine HAVE_MNN
 
+/* TF-lite support*/
+#cmakedefine HAVE_TFLITE
+
 /* ONNXRuntime support */
 #cmakedefine HAVE_ORT
 

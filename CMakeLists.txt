@@ -16,6 +16,7 @@ endif()
 # set(CMAKE_BUILD_TYPE "Release")
 
 include(cmake/OpenCVMinDepVersions.cmake)
+set(CMAKE_FIND_FRAMEWORK LAST) # can fix the bug of png version mismatch.
 
 if(CMAKE_SYSTEM_NAME MATCHES WindowsPhone OR CMAKE_SYSTEM_NAME MATCHES WindowsStore)
   cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
@@ -26,7 +27,7 @@ if(CMAKE_SYSTEM_NAME MATCHES WindowsPhone OR CMAKE_SYSTEM_NAME MATCHES WindowsSt
 else()
   cmake_minimum_required(VERSION "${MIN_VER_CMAKE}" FATAL_ERROR)
 endif()
-
+set(CMAKE_CXX_STANDARD 14) # tf-lite depends on CXX 14
 #
 # Configure CMake policies
 #
@@ -484,6 +485,10 @@ OCV_OPTION(WITH_MNN "MNN Backend support in dnn." ON
         VISIBLE_IF TRUE
         VERIFY HAVE_MNN)
 
+OCV_OPTION(WITH_TFLITE "TFLITE Backend support in dnn." ON
+        VISIBLE_IF TRUE
+        VERIFY HAVE_TFLITE)
+
 # OpenCV build components
 # ===================================================
 OCV_OPTION(BUILD_SHARED_LIBS        "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" NOT (ANDROID OR APPLE_FRAMEWORK) )
@@ -770,6 +775,10 @@ endif()
 
 if(WITH_MNN)
   include(cmake/OpenCVDetectMNN.cmake)
+endif()
+
+if(WITH_TFLITE)
+  include(cmake/OpenCVDetectTFLITE.cmake)
 endif()
 
 # ----------------------------------------------------------------------------
@@ -1670,6 +1679,17 @@ if(WITH_MNN)
   if(HAVE_MNN)
     status("    MNN Include path"  MNN_INC THEN "${MNN_INC}" ELSE "NO")
     status("    MNN Link libraries:" MNN_LIB THEN "${MNN_LIB}" ELSE "NO")
+  endif()
+endif()
+
+if(WITH_TFLITE)
+  status("")
+  status("  TF-lite:"     HAVE_TFLITE THEN "YES" ELSE "NO")
+  if(HAVE_TFLITE)
+    status("    TF-lite Include path"  TFLITE_INC THEN "${TFLITE_INC}" ELSE "NO")
+    status("    GEMMLOWP Include path:" TFLITE_GEMMLOWP_INC THEN "${TFLITE_GEMMLOWP_INC}" ELSE "NO")
+    status("    FLATBUFFERS Include path:" TFLITE_FLATBUFFERS_INC THEN "${TFLITE_FLATBUFFERS_INC}" ELSE "NO")
+    status("    TF-lite Link libraries:" TFLITE_LIB THEN "${TFLITE_LIB}" ELSE "NO")
   endif()
 endif()
 

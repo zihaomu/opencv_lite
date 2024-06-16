@@ -66,8 +66,8 @@ typedef signed char schar;
 
 #define CV_USRTYPE1 (void)"CV_USRTYPE1 support has been dropped in OpenCV 4.0"
 
-#define CV_CN_MAX     512
-#define CV_CN_SHIFT   4
+#define CV_CN_MAX     128
+#define CV_CN_SHIFT   5
 #define CV_DEPTH_MAX  (1 << CV_CN_SHIFT)
 
 #define CV_8U   0

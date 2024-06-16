@@ -72,23 +72,32 @@ CV__DNN_INLINE_NS_BEGIN
     };
 
     /**
+     * @brief Enum of model source type.
+     * @see Net::type
+     */
+    enum ModelType
+    {
+        DNN_TYPE_UNKNOW = 0,
+        DNN_TYPE_MNN = 1,
+        DNN_TYPE_TFLITE = 2,
+        DNN_TYPE_ORT = 3,   // onnxruntime
+        DNN_TYPE_TENSORRT = 4,   // tensorrt
+    };
+
+    /**
      * @brief Enum of computation backends supported by layers.
      * @see Net::setPreferableBackend
      */
     enum Backend
     {
-        DNN_BACKEND_OPENCV = -1, // deprecated
-        DNN_BACKEND_DEFAULT = 0, // CPU
-        DNN_BACKEND_OPENCL, // For OpenCL GPU
-        DNN_BACKEND_CUDA,   // For Nvidia GPU
+        DNN_BACKEND_CPU = 0, // CPU
+        DNN_BACKEND_GPU = 1, // MNN:OpenCL, tflite:OpenCL, ORT:CUDA, TensorRT:CUDA.
     };
 
     //! deprecated. Currently, we only use Backend as target Device.
     enum Target
     {
         DNN_TARGET_CPU = 0,
-        DNN_TARGET_OPENCL_GPU,
-        DNN_TARGET_CUDA,
     };
 
     CV_EXPORTS std::vector< std::pair<Backend, Target> > getAvailableBackends();
@@ -153,13 +162,6 @@ CV__DNN_INLINE_NS_BEGIN
         CV_WRAP void forward(OutputArrayOfArrays outputBlobs,
                              const std::vector<String>& outBlobNames);
 
-        /** @brief Runs forward pass to compute outputs of layers listed in @p outBlobNames.
-         *  @param outputBlobs contains all output blobs for each layer specified in @p outBlobNames.
-         *  @param outBlobNames names for layers which outputs are needed to get
-         */
-//        CV_WRAP_AS(forwardAndRetrieve) void forward(CV_OUT std::vector<std::vector<Mat> >& outputBlobs,
-//                                                    const std::vector<String>& outBlobNames);
-
         /** @brief Load model params to this net.
          *  @param modelPath model path.
          */
@@ -178,15 +180,11 @@ CV__DNN_INLINE_NS_BEGIN
 
         /**
          * @brief Ask network to use specific computation backend where it supported.
-         * @param[in] backendId backend identifier.
+         * @param[in] backendId backend identifier
          * @see Backend
          */
-        CV_WRAP void setPreferableBackend(int backendId)
-        {
-            // TODO! Add OpenCL and CUDA supported.
-            CV_LOG_WARNING(NULL, "setPreferableBackend do nothing. Currently only supports the CPU backend, and will support the CUDA backend in the future!");
-            // do nothing.
-        }
+        CV_WRAP void setPreferableBackend(int backendId);
+
 
         /** @deprecated use setPreferableBackend is enough!*/
         CV_WRAP void setPreferableTarget(int targetId)
@@ -194,6 +192,13 @@ CV__DNN_INLINE_NS_BEGIN
             CV_LOG_WARNING(NULL, "setPreferableTarget is deprecated on opencv lite version, use setPreferableBackend to trigger target device!");
             // do nothing
         }
+
+        /**
+         * @brief Return net type.
+         * @return source model type.
+         * @see ModelType
+         */
+        CV_WRAP int getType();
 
         /**
          * @brief Ask network to use specific computation precision model.
@@ -207,6 +212,12 @@ CV__DNN_INLINE_NS_BEGIN
          * @param[in] numThread number of threads.
          */
         CV_WRAP void setNumThreads(int numThread);
+
+        /**
+         * @brief get the number of threads
+         * @returns number of threads.
+         */
+        CV_WRAP int getNumThreads();
 
         /** @brief Sets the new input value for the network
          *  @param blob        A new blob. Should have CV_32F or CV_8U depth.
@@ -225,22 +236,11 @@ CV__DNN_INLINE_NS_BEGIN
          */
         CV_WRAP void setInputShape(const String &inputName, const MatShape& shape);
 
-        CV_WRAP std::vector<std::string> getInputName();
-        CV_WRAP std::vector<std::string> getOutputName();
+        CV_WRAP std::vector<std::string> getInputName() const;
+        CV_WRAP std::vector<std::string> getOutputName() const;
 
-        CV_WRAP std::vector<MatShape> getInputShape();
-        CV_WRAP std::vector<MatShape> getOutputShape();
-
-        /** @brief Enables or disables layer fusion in the network.
-         * @param fusion true to enable the fusion, false to disable. The fusion is enabled by default.
-         */
-//        CV_WRAP void enableFusion(bool fusion);
-
-        /** @brief Enables or disables the Winograd compute branch. The Winograd compute branch can speed up
-         * 3x3 Convolution at a small loss of accuracy.
-        * @param useWinograd true to enable the Winograd compute branch. The default is true.
-        */
-//        CV_WRAP void enableWinograd(bool useWinograd);
+        CV_WRAP std::vector<MatShape> getInputShape() const;
+        CV_WRAP std::vector<MatShape> getOutputShape() const;
 
         class Impl;
         inline Impl* getImpl() const { return impl.get(); }
@@ -326,6 +326,19 @@ CV__DNN_INLINE_NS_BEGIN
      */
     CV_EXPORTS_W Net readNetFromMNN(const String &mnnFile);
 
+    /** @brief Reads a network model from .tflite in-memory buffer.
+     *  @param buffer memory address of the first byte of the buffer.
+     *  @param sizeBuffer size of the buffer.
+     *  @returns Network object that ready to do forward, throw an exception in failure cases.
+     */
+    CV_EXPORTS_W Net readNetFromTflite(const char* buffer, size_t sizeBuffer);
+
+    /** @brief Reads a network model from .tflite file.
+     *  @param tfFile path to the .mnn file with text description of the network architecture.
+     *  @returns Network object that ready to do forward, throw an exception in failure cases.
+     */
+    CV_EXPORTS_W Net readNetFromTflite(const String &tfFile);
+
     /** @brief Creates blob from .pb file.
      *  @param path to the .pb file with input tensor.
      *  @returns Mat.
@@ -410,7 +423,7 @@ CV__DNN_INLINE_NS_BEGIN
      * @param[in] blob mutil-dimensional array 1D, 2D, ... data in any data type.
      * @param[in] printLen By default, the first 100 elements of Mat are printed. Setting -1 prints all elements
      */
-    CV_EXPORTS_W void printMatData(InputArray blob, int printLen = 100);
+    CV_EXPORTS_W void printMatData(InputArray blob, int printLen = -1);
 
 //! @}
 CV__DNN_INLINE_NS_END

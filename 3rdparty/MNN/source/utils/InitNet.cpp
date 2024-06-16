@@ -238,7 +238,7 @@ void initPipelineInfosFromOps(std::vector<Schedule::OpCacheInfo>& infos, std::ve
         }
     }
 }
-
+// 设置模型的输入输出，这串代码就是为了找出模型中的输入和输出tensor的index
 void setInputOutputForOps(std::vector<std::shared_ptr<Tensor>>& allTensors, const std::vector<const Op*>& ops, bool isStatic) {
     std::set<int> inputIndexes;
     std::set<int> outputIndexes;
@@ -287,7 +287,7 @@ void setInputOutputForOps(std::vector<std::shared_ptr<Tensor>>& allTensors, cons
     std::set_difference(outputIndexes.begin(), outputIndexes.end(), inputIndexes.begin(), inputIndexes.end(),
                         std::inserter(output, output.begin()));
     std::set_difference(inputIndexes.begin(), inputIndexes.end(), outputIndexes.begin(), outputIndexes.end(),
-                        std::inserter(input, input.begin()));
+                        std::inserter(input, input.begin())); // 寻找前后链接交集合，然后剔除掉交，这个有点奇怪。
     // 3. set usage for Tensor by index
     for (auto index : input) {
         auto des = TensorUtils::getDescribe(allTensors[index].get());

@@ -57,7 +57,7 @@ bool FileLoader::read() {
             MNN_PRINT("Memory Alloc Failed\n");
             return false;
         }
-        size = fread(block, 1, gCacheSize, mFile);
+        size = fread(block, 1, gCacheSize, mFile); // 这里是分批读取，这是为啥？
         if (size > gCacheSize) {
             MNN_PRINT("Read file Error\n");
             MNNMemoryFreeAlign(block);
@@ -107,7 +107,7 @@ bool FileLoader::merge(AutoStorage<uint8_t>& buffer) {
     }
     auto dst   = buffer.get();
     int offset = 0;
-    for (auto iter : mBlocks) {
+    for (auto iter : mBlocks) { // 这个还持有这段内存是为啥？
         ::memcpy(dst + offset, iter.second, iter.first);
         offset += iter.first;
     }

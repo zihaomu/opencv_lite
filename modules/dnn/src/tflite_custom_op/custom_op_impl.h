@@ -1,18 +1,21 @@
 //
-// Created by mzh on 2023/7/14.
+// Created by mzh on 2024/3/6.
 //
 
-#ifndef MNN_TFLITE_HEADER_H
-#define MNN_TFLITE_HEADER_H
+#ifndef OPENCV_CUSTOM_OP_IMPL_H
+#define OPENCV_CUSTOM_OP_IMPL_H
+#include "../precomp.hpp"
 
 #include "vector"
-#include <cstring>
+namespace cv {
+namespace dnn {
+namespace mp_op {
 
 struct float2
 {
     float2();
     float2(float a, float b);
-
+    float operator [] (int i) const;
     float x;
     float y;
 };
@@ -21,6 +24,7 @@ struct float3
 {
     float3();
     float3(float a, float b, float c);
+    float operator [] (int i) const;
     float x;
     float y;
     float z;
@@ -30,11 +34,27 @@ struct float4
 {
     float4();
     float4(float a, float b, float c, float d);
-
+    float operator [] (int i) const;
     float x;
     float y;
     float z;
     float w;
+};
+
+struct int2
+{
+    int2();
+    int2(int a, int b);
+    int operator [] (int i) const;
+    std::vector<int> data;
+};
+
+struct int3
+{
+    int3();
+    int3(int a, int b, int c);
+    int operator [] (int i) const;
+    std::vector<int> data;
 };
 
 float DotProduct(const float4& l, const float4& r);
@@ -72,4 +92,6 @@ struct Mat4 {
     std::vector<float> data;
 };
 
-#endif //MNN_TFLITE_HEADER_H
+}}}
+
+#endif //OPENCV_CUSTOM_OP_IMPL_H

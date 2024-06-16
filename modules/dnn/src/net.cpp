@@ -42,28 +42,28 @@ void Net::forward(OutputArrayOfArrays outputBlobs, const std::vector<String>& ou
     return impl->forward(outputBlobs, outBlobNames);
 }
 
-std::vector<std::string> Net::getInputName()
+std::vector<std::string> Net::getInputName() const
 {
     CV_TRACE_FUNCTION();
     CV_Assert(impl);
     return impl->getInputName();
 }
 
-std::vector<std::string> Net::getOutputName()
+std::vector<std::string> Net::getOutputName() const
 {
     CV_TRACE_FUNCTION();
     CV_Assert(impl);
     return impl->getOutputName();
 }
 
-std::vector<MatShape> Net::getInputShape()
+std::vector<MatShape> Net::getInputShape() const
 {
     CV_TRACE_FUNCTION();
     CV_Assert(impl);
     return impl->getInputShape();
 }
 
-std::vector<MatShape> Net::getOutputShape()
+std::vector<MatShape> Net::getOutputShape() const
 {
     CV_TRACE_FUNCTION();
     CV_Assert(impl);
@@ -77,19 +77,30 @@ void Net::readNet(const char* _framework, const char* buffer, size_t sizeBuffer)
 #ifdef HAVE_MNN
     if (framework == "mnn")
     {
-        impl = makePtr<ImplMNN>();
+        impl = makePtr<dnn_mnn::ImplMNN>();
+        impl->setType(ModelType::DNN_TYPE_MNN);
     } else
 #endif
 #ifdef HAVE_TRT
     else if (framework == "onnx")
     {
+        impl->setType(ModelType::DNN_TYPE_ORT);
         CV_Error(Error::StsError, "read ONNX from buffer is being developed, please contact the developer.");
     } else
 #endif
 #ifdef HAVE_ORT
     if (framework == "trt")
     {
+        impl->setType(ModelType::DNN_TYPE_TENSORRT);
         CV_Error(Error::StsError, "read TensorRT from buffer is being developed, please contact the developer.");
+    }
+    else
+#endif
+#ifdef HAVE_TFLITE
+    if (framework == "tflite")
+    {
+        impl = makePtr<dnn_tflite::ImplTflite>();
+        impl->setType(ModelType::DNN_TYPE_TFLITE);
     }
     else
 #endif
@@ -110,6 +121,7 @@ void Net::readNet(const String& _model)
     if (modelExt == "onnx")
     {
         impl = makePtr<ImplORT>();
+        impl->setType(ModelType::DNN_TYPE_ORT);
     }
     else 
 #endif
@@ -117,15 +129,25 @@ void Net::readNet(const String& _model)
     if (modelExt == "trt")
     {
         impl = makePtr<ImplTensorRT>();
+        impl->setType(ModelType::DNN_TYPE_TENSORRT);
     }
     else
 #endif
 #ifdef HAVE_MNN
     if (modelExt == "mnn")
     {
-        impl = makePtr<ImplMNN>();
+        impl = makePtr<dnn_mnn::ImplMNN>();
+        impl->setType(ModelType::DNN_TYPE_MNN);
     }
     else 
+#endif
+#ifdef HAVE_TFLITE
+    if (modelExt == "tflite")
+    {
+        impl = makePtr<dnn_tflite::ImplTflite>();
+        impl->setType(ModelType::DNN_TYPE_TFLITE);
+    }
+    else
 #endif
     CV_Assert(impl && "Net::impl is empty! Please make sure the you have compiled OpenCV_lite with ONNXRuntime or MNN or TensorRT!");
 
@@ -156,13 +178,14 @@ void Net::setPreferablePrecision(int precisionId)
 //    return impl->forward(outputBlobs, outBlobNames);
 //}
 //
-//void Net::setPreferableBackend(int backendId)
-//{
-//    CV_TRACE_FUNCTION();
-//    CV_TRACE_ARG(backendId);
-//    CV_Assert(impl);
-//    return impl->setPreferableBackend(*this, backendId);
-//}
+
+void Net::setPreferableBackend(int backendId)
+{
+    CV_TRACE_FUNCTION();
+    CV_TRACE_ARG(backendId);
+    CV_Assert(impl);
+    return impl->setPreferableBackend((Backend)backendId);
+}
 //
 //void Net::setPreferableTarget(int targetId)
 //{
@@ -171,6 +194,18 @@ void Net::setPreferablePrecision(int precisionId)
 //    CV_Assert(impl);
 //    return impl->setPreferableTarget(targetId);
 //}
+
+int Net::getType()
+{
+    CV_Assert(impl);
+    return (int)impl->getType();
+}
+
+int Net::getNumThreads()
+{
+    CV_Assert(impl);
+    return (int)impl->getNumThreads();
+}
 
 bool Net::empty() const
 {

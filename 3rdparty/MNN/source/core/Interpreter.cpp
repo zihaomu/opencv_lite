@@ -27,7 +27,7 @@
 #endif // MNN_INTERNAL_ENABLED
 
 namespace MNN {
-
+// Net实际的概念在Content中，其中保存了模型的原始buffer，包括session的指针，tensor map，等资源。
 struct Content {
     AutoStorage<uint8_t> buffer;
     const Net* net = nullptr;
@@ -78,8 +78,8 @@ static Content* loadModelFile(const char* file) {
         MNN_PRINT("Create interpreter failed, %s is empty\n", file);
         return nullptr;
     }
-    auto net     = new Content;
-    bool success = loader->merge(net->buffer);
+    auto net     = new Content;  // 创建一个Net
+    bool success = loader->merge(net->buffer); // merge这个看着有点奇怪，实际是将loader中的数据拷贝到net->buffer中来。
     if (!success) {
         return nullptr;
     }
@@ -93,7 +93,7 @@ Interpreter* Interpreter::createFromFile(const char* file) {
         return nullptr;
     }
 
-    return createFromBufferInternal(net, true);
+    return createFromBufferInternal(net, true); // 这里是拿着net内存去创建Interpreter
 }
 Interpreter* Interpreter::createFromBuffer(const void* buffer, size_t size) {
     if (nullptr == buffer || 0 == size) {
@@ -124,7 +124,7 @@ Interpreter* Interpreter::createFromBufferInternal(Content* net, bool enforceAut
         return nullptr;
     }
 #endif
-    net->net = GetNet(net->buffer.get());
+    net->net = GetNet(net->buffer.get()); // 整了半天，是为了获取net
     if (nullptr == net->net->oplists()) {
         MNN_ERROR("Model has no oplist\n");
         delete net;

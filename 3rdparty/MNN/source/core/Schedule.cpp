@@ -259,7 +259,7 @@ bool Schedule::schedule(ScheduleInfo& scheduleInfo, const Net* net, const std::v
     for (int i = 0; i < net->tensorName()->size(); ++i) {
         tensorNameIndexMap[net->tensorName()->Get(i)->str()] = i;
     }
-    bool userSetOutput = false;
+    bool userSetOutput = false; // 类似于opencv，保存中间计算的tensor结果。
     for (auto& config : configs) {
         userSetOutput = userSetOutput || (!config.saveTensors.empty());
         for (const auto& name : config.saveTensors) {
@@ -299,7 +299,7 @@ bool Schedule::schedule(ScheduleInfo& scheduleInfo, const Net* net, const std::v
         auto t = allTensors[index].get();
         auto usage = TensorUtils::getDescribe(t)->usage;
         if (usage == Tensor::InsideDescribe::INPUT) {
-            scheduleInfo.inputTensors.insert(std::make_pair(net->tensorName()->GetAsString(index)->c_str(), t));
+            scheduleInfo.inputTensors.insert(std::make_pair(net->tensorName()->GetAsString(index)->c_str(), t)); // 这个玩意保存的Tensor应该不会被内存复用。
         }
         if (usage == Tensor::InsideDescribe::OUTPUT && (!userSetOutput)) {
             scheduleInfo.outputTensor.insert(

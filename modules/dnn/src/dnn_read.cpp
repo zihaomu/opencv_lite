@@ -26,6 +26,10 @@ Net readNet(const String& _model)
     {
         return readNetFromTRT(model);
     }
+    else if (modelExt == "tflite")
+    {
+        return readNetFromTflite(model);
+    }
     else if (modelExt == "mnn")
     {
         return readNetFromMNN(model);
@@ -56,6 +60,20 @@ Net readNetFromMNN(const char* buffer, size_t sizeBuffer)
 }
 
 Net readNetFromMNN(const String& _model)
+{
+    Net net = Net();
+    net.readNet(_model);
+    return net;
+}
+
+Net readNetFromTflite(const char* buffer, size_t sizeBuffer)
+{
+    Net net = Net();
+    net.readNet("tflite", buffer, sizeBuffer);
+    return net;
+}
+
+Net readNetFromTflite(const String& _model)
 {
     Net net = Net();
     net.readNet(_model);

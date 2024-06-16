@@ -73,6 +73,7 @@ public:
         // set Thread and set precision.
         net.setPreferablePrecision(precisionId);
         net.setNumThreads(numThreads);
+        net.setPreferableBackend(Backend::DNN_BACKEND_GPU);
 
         auto inputShapes = net.getInputShape();
         auto outputShapes = net.getOutputShape();

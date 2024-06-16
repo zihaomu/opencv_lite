@@ -180,7 +180,7 @@ static inline void printData(T* data, const int len)
 }
 
 template<>
-static inline void printData(uint8_t * data, const int len)
+inline void printData(uint8_t * data, const int len)
 {
     for (int i = 0; i < len; i++)
     {
@@ -189,7 +189,7 @@ static inline void printData(uint8_t * data, const int len)
 }
 
 template<>
-static inline void printData(int8_t * data, const int len)
+inline void printData(int8_t * data, const int len)
 {
     for (int i = 0; i < len; i++)
     {

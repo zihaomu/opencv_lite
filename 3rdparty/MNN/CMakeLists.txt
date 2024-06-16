@@ -28,7 +28,7 @@ set(CMAKE_MODULE_PATH
 # build options
 option(MNN_USE_SYSTEM_LIB "For opencl and vulkan, use system lib or use dlopen" OFF)
 option(MNN_BUILD_HARD "Build -mfloat-abi=hard or not" OFF)
-option(MNN_BUILD_SHARED_LIBS "MNN build shared or static lib" OFF)
+option(MNN_BUILD_SHARED_LIBS "MNN build shared or static lib" ON)
 option(MNN_WIN_RUNTIME_MT "MNN use /MT on Windows dll" OFF)
 option(MNN_FORBID_MULTI_THREAD "Disable Multi Thread" OFF)
 option(MNN_OPENMP "Use OpenMP's thread pool implementation. Does not work on iOS or Mac OS" OFF)
@@ -62,8 +62,7 @@ option(MNN_JNI "Build MNN Jni for java to use" OFF)
 
 ocv_warnings_disable(CMAKE_CXX_FLAGS -Wno-deprecated -Wmissing-prototypes -Wmissing-declarations -Wshadow
 -Wunused-parameter -Wsign-compare -Wunused-variable -Wnon-virtual-dtor -Wundef -Wunused-function -Wno-unused-result -Wunused-but-set-variable
--Wreorder-ctor -Warray-parameter -Wunused-lambda-capture -Wignored-qualifiers -Wuninitialized -Woverloaded-virtual
-
+-Wreorder-ctor -Warray-parameter -Wunused-lambda-capture -Wignored-qualifiers -Wuninitialized -Woverloaded-virtual -Wunused-private-field
 )
 
 IF (NOT DEFINED MNN_USE_SPARSE_COMPUTE)
