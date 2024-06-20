@@ -489,6 +489,10 @@ OCV_OPTION(WITH_TFLITE "TFLITE Backend support in dnn." ON
         VISIBLE_IF TRUE
         VERIFY HAVE_TFLITE)
 
+OCV_OPTION(WITH_TRT "TensorRT Backend support in dnn." ON
+        VISIBLE_IF TRUE
+        VERIFY HAVE_TRT)
+
 # OpenCV build components
 # ===================================================
 OCV_OPTION(BUILD_SHARED_LIBS        "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" NOT (ANDROID OR APPLE_FRAMEWORK) )
@@ -779,6 +783,10 @@ endif()
 
 if(WITH_TFLITE)
   include(cmake/OpenCVDetectTFLITE.cmake)
+endif()
+
+if(WITH_TRT)
+  include(cmake/OpenCVDetectTRT.cmake)
 endif()
 
 # ----------------------------------------------------------------------------
@@ -1690,6 +1698,15 @@ if(WITH_TFLITE)
     status("    GEMMLOWP Include path:" TFLITE_GEMMLOWP_INC THEN "${TFLITE_GEMMLOWP_INC}" ELSE "NO")
     status("    FLATBUFFERS Include path:" TFLITE_FLATBUFFERS_INC THEN "${TFLITE_FLATBUFFERS_INC}" ELSE "NO")
     status("    TF-lite Link libraries:" TFLITE_LIB THEN "${TFLITE_LIB}" ELSE "NO")
+  endif()
+endif()
+
+if(WITH_TRT)
+  status("")
+  status("  TensorRT:"     HAVE_TRT THEN "YES" ELSE "NO")
+  if(HAVE_TRT)
+    status("    TensorRT include:"  TRT_SDK_INC THEN "${TRT_SDK_INC}" ELSE "NO")
+    status("    TensorRT lib:" TRT_SDK_LIB THEN "${TRT_SDK_LIB}" ELSE "NO")
   endif()
 endif()
 

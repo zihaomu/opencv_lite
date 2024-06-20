@@ -28,6 +28,12 @@
 #include "tensorflow/lite/delegates/gpu/delegate.h"
 #endif
 
+#ifdef HAVE_TRT
+#include <cuda_runtime_api.h>
+#include <NvInfer.h>
+#include <NvOnnxParser.h>
+#endif
+
 namespace cv {
 namespace dnn {
 CV__DNN_INLINE_NS_BEGIN
@@ -48,6 +54,7 @@ public:
     virtual int getNumThreads();
     virtual void setPreferableBackend(Backend device);        // setting computing device
     virtual void setPreferablePrecision(Precision precision); // setting computing accuracy
+    virtual void setConfig(NetConfig* config);              // setting model config.
     // setting input shape.
     virtual void setInputShape(const cv::String &inputName, const cv::dnn::MatShape &shape);
 
@@ -75,6 +82,14 @@ public:
     std::vector<MatShape> getOutputShape();
 
 protected:
+    // this function will return the index of inputNamesString with given input name.
+    virtual int getInputIndex(const String &name);
+
+    // for output
+    virtual int getOutputIndex(const String& name);
+
+    // TODO use netConfig instead of single params
+    NetConfig netConfig;
     int thread_num = 4;  // default thread number
     int inputCount = 0;
     int outputCount = 0;
@@ -122,7 +137,7 @@ private:
 #endif
 
 #ifdef HAVE_TRT
-// TODO
+namespace dnn_trt {
 class ImplTensorRT : public Net::Impl
 {
 public:
@@ -131,10 +146,44 @@ public:
     void setNumThreads(int num) override;
     void readNet(const String& model) override;
     void setInput(InputArray blob_, const String& name) override;
+    void setConfig(NetConfig* config) override;
     void forward(OutputArrayOfArrays outputBlobs,
-                 const std::vector<String>& outBlobNames) override;
+        const std::vector<String>& outBlobNames) override;
 private:
+
+    // Allocate Host memory and binding to the engine.
+    void allocMem();
+    void tensors2Mats(const std::vector<int>& outputIdxs, std::vector<Mat>& outputMat);
+
+    NetConfig_TRT configTRT;
+    std::vector<int> input_idxs;
+    std::vector<int> output_idxs;
+
+    //<<<<<<<<<<<<<<<<<< TensorRT resource  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    std::vector<::nvinfer1::Dims> inputMatShapeTrt;                      //!< The dimensions of the input to the network.
+    std::vector<::nvinfer1::Dims> outputMatShapeTrt;                      //!< The dimensions of the input to the network.
+
+    // The following two buffer list contains both input/output. It orgnizes as input_idxs/output_idxs
+    std::vector<std::pair<AutoBuffer<uchar>, size_t>> bufferListHost; // pointer and size (can be overwritten by user)
+    std::vector<void *> bufferListDevice;                  // pointer to GPU memory
+
+    Ptr<::nvinfer1::IRuntime> runtime_;
+    Ptr<::nvinfer1::ICudaEngine> engine_;
+    Ptr<::nvinfer1::IExecutionContext> context_;
+
+    Ptr<::nvinfer1::IBuilder> builder_;
+    Ptr<::nvinfer1::INetworkDefinition> network_;
+    Ptr<::nvinfer1::IBuilderConfig> config_;
+    const bool verboseLog = false;
+
+    //<<<<<<<<<<<<<<<<<< CUDA resource  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    cudaStream_t stream_ = nullptr;
+    int device_id_;
+    std::string compute_capability_;
+
+    cv::Mutex mutex;
 };
+}
 #endif
 
 #ifdef HAVE_MNN
@@ -159,7 +208,6 @@ public:
 
     void forward(OutputArrayOfArrays outputBlobs,
                  const std::vector<String> &outBlobNames) override;
-
 private:
     void parseTensorInfoFromSession();
 

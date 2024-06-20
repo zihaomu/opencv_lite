@@ -36,11 +36,18 @@ void Net::Impl::setNumThreads(int num)
 }
 
 // TODO finish the implement of the Precision and device
-void Net::Impl::setPreferablePrecision(Precision precision)
+void Net::Impl::setPreferablePrecision(Precision)
 {
     // TOOD
     CV_LOG_WARNING(NULL, "The setPreferablePrecision does nothing!");
 }
+
+void Net::Impl::setConfig(NetConfig*)
+{
+    // TOOD
+    CV_LOG_WARNING(NULL, "The setConfig does nothing!");
+}
+
 
 void Net::Impl::setInputShape(const cv::String &, const cv::dnn::MatShape &)
 {
@@ -121,6 +128,58 @@ void Net::Impl::forward(OutputArrayOfArrays outputBlobs, const String& outputNam
     }
 
     return forward(outputBlobs, outputNames);
+}
+
+int Net::Impl::getOutputIndex(const String &name)
+{
+    int indexRes = -1;
+
+    // if the name is empty, we need to check out if the mode only need 1 input,
+    // if it's true, then we set this input as this input.
+    if (name.empty())
+    {
+        CV_Assert(outputNamesString.size() == 1 && "Please set the input name, the default input name can only be used in single input model.");
+        indexRes = 0;
+    }
+
+    // find input index to get shape info.
+    if (indexRes == -1)
+    {
+        auto iter = std::find(outputNamesString.begin(), outputNamesString.end(), name);
+
+        if (iter != outputNamesString.end())
+        {
+            indexRes = iter - outputNamesString.begin();
+        }
+    }
+
+    return indexRes;
+}
+
+int Net::Impl::getInputIndex(const String& name)
+{
+    int indexRes = -1;
+
+    // if the name is empty, we need to check out if the mode only need 1 input,
+    // if it's true, then we set this input as this input.
+    if (name.empty())
+    {
+        CV_Assert(inputNamesString.size() == 1 && "Please set the input name, the default input name can only be used in single input model.");
+        indexRes = 0;
+    }
+
+    // find input index to get shape info.
+    if (indexRes == -1)
+    {
+        auto iter = std::find(inputNamesString.begin(), inputNamesString.end(), name);
+
+        if (iter != inputNamesString.end())
+        {
+            indexRes = iter - inputNamesString.begin();
+        }
+    }
+
+    return indexRes;
 }
 
 CV__DNN_INLINE_NS_END

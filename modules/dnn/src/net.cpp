@@ -10,6 +10,14 @@ namespace cv {
 namespace dnn {
 CV__DNN_INLINE_NS_BEGIN
 
+NetConfig_TRT::NetConfig_TRT(NetConfig& config): useCache(false), cachePath(nullptr), useFP16(false), useDLA(false)
+{
+    threadNum = config.threadNum;
+    backend = config.backend;
+    target = config.target;
+    precision = config.precision;
+}
+
 Net::Net()
 {
 }
@@ -45,28 +53,28 @@ void Net::forward(OutputArrayOfArrays outputBlobs, const std::vector<String>& ou
 std::vector<std::string> Net::getInputName() const
 {
     CV_TRACE_FUNCTION();
-    CV_Assert(impl);
+    CV_Assert(impl.get());
     return impl->getInputName();
 }
 
 std::vector<std::string> Net::getOutputName() const
 {
     CV_TRACE_FUNCTION();
-    CV_Assert(impl);
+    CV_Assert(impl.get());
     return impl->getOutputName();
 }
 
 std::vector<MatShape> Net::getInputShape() const
 {
     CV_TRACE_FUNCTION();
-    CV_Assert(impl);
+    CV_Assert(impl.get());
     return impl->getInputShape();
 }
 
 std::vector<MatShape> Net::getOutputShape() const
 {
     CV_TRACE_FUNCTION();
-    CV_Assert(impl);
+    CV_Assert(impl.get());
     return impl->getOutputShape();
 }
 
@@ -78,29 +86,18 @@ void Net::readNet(const char* _framework, const char* buffer, size_t sizeBuffer)
     if (framework == "mnn")
     {
         impl = makePtr<dnn_mnn::ImplMNN>();
-        impl->setType(ModelType::DNN_TYPE_MNN);
-    } else
-#endif
-#ifdef HAVE_TRT
-    else if (framework == "onnx")
-    {
-        impl->setType(ModelType::DNN_TYPE_ORT);
-        CV_Error(Error::StsError, "read ONNX from buffer is being developed, please contact the developer.");
     } else
 #endif
 #ifdef HAVE_ORT
-    if (framework == "trt")
+     if (framework == "onnx")
     {
-        impl->setType(ModelType::DNN_TYPE_TENSORRT);
-        CV_Error(Error::StsError, "read TensorRT from buffer is being developed, please contact the developer.");
-    }
-    else
+        CV_Error(Error::StsError, "read ONNX from buffer is being developed, please contact the developer.");
+    } else
 #endif
-#ifdef HAVE_TFLITE
-    if (framework == "tflite")
+#ifdef HAVE_TRT
+    if (framework == "trt" || framework == "onnx")
     {
-        impl = makePtr<dnn_tflite::ImplTflite>();
-        impl->setType(ModelType::DNN_TYPE_TFLITE);
+        CV_Error(Error::StsError, "read TensorRT from buffer is being developed, please contact the developer.");
     }
     else
 #endif
@@ -121,15 +118,13 @@ void Net::readNet(const String& _model)
     if (modelExt == "onnx")
     {
         impl = makePtr<ImplORT>();
-        impl->setType(ModelType::DNN_TYPE_ORT);
     }
-    else 
+    else
 #endif
 #ifdef HAVE_TRT
-    if (modelExt == "trt")
+    if (modelExt == "trt" || modelExt == "onnx") // TensoRT support onnx offically.
     {
-        impl = makePtr<ImplTensorRT>();
-        impl->setType(ModelType::DNN_TYPE_TENSORRT);
+        impl = makePtr<dnn_trt::ImplTensorRT>();
     }
     else
 #endif
@@ -137,15 +132,6 @@ void Net::readNet(const String& _model)
     if (modelExt == "mnn")
     {
         impl = makePtr<dnn_mnn::ImplMNN>();
-        impl->setType(ModelType::DNN_TYPE_MNN);
-    }
-    else 
-#endif
-#ifdef HAVE_TFLITE
-    if (modelExt == "tflite")
-    {
-        impl = makePtr<dnn_tflite::ImplTflite>();
-        impl->setType(ModelType::DNN_TYPE_TFLITE);
     }
     else
 #endif
@@ -158,6 +144,13 @@ void Net::setPreferablePrecision(int precisionId)
 {
     CV_TRACE_FUNCTION();
     return impl->setPreferablePrecision((Precision)precisionId);
+}
+
+void Net::setConfig(NetConfig* config)
+{
+    CV_TRACE_FUNCTION();
+    CV_Assert(config && "config is empty!");
+    return impl->setConfig(config);
 }
 
 //void Net::forward(OutputArrayOfArrays outputBlobs,
@@ -178,7 +171,6 @@ void Net::setPreferablePrecision(int precisionId)
 //    return impl->forward(outputBlobs, outBlobNames);
 //}
 //
-
 void Net::setPreferableBackend(int backendId)
 {
     CV_TRACE_FUNCTION();
@@ -194,18 +186,6 @@ void Net::setPreferableBackend(int backendId)
 //    CV_Assert(impl);
 //    return impl->setPreferableTarget(targetId);
 //}
-
-int Net::getType()
-{
-    CV_Assert(impl);
-    return (int)impl->getType();
-}
-
-int Net::getNumThreads()
-{
-    CV_Assert(impl);
-    return (int)impl->getNumThreads();
-}
 
 bool Net::empty() const
 {
@@ -232,22 +212,6 @@ void Net::setInput(InputArray blob, const String& name)
     CV_Assert(impl);
     return impl->setInput(blob, name);
 }
-
-// TODO replace the following code with useful API.
-// FIXIT return old value or add get method
-//void Net::enableFusion(bool fusion)
-//{
-//    CV_TRACE_FUNCTION();
-//    CV_Assert(impl);
-//    return impl->enableFusion(fusion);
-//}
-
-//void Net::enableWinograd(bool useWinograd)
-//{
-//    CV_TRACE_FUNCTION();
-//    CV_Assert(impl);
-//    return impl->enableWinograd(useWinograd);
-//}
 
 CV__DNN_INLINE_NS_END
 }}  // namespace cv::dnn

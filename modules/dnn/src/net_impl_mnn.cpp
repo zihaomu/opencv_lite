@@ -294,26 +294,7 @@ void ImplMNN::setInput(cv::InputArray blob_, const cv::String &name)
 {
     Mat blob = blob_.getMat();
 
-    int indexRes = -1;
-
-    // if the name is empty, we need to check out if the mode only need 1 input,
-    // if it's true, then we set this input as this input.
-    if (name.empty())
-    {
-        CV_Assert(inputNamesString.size() == 1 && "Please set the input name, the default input name can only be used in single input model.");
-        indexRes = 0;
-    }
-
-    // find input index to get shape info.
-    if (indexRes == -1)
-    {
-        auto iter = std::find(inputNamesString.begin(), inputNamesString.end(), name);
-
-        if (iter != inputNamesString.end())
-        {
-            indexRes = iter - inputNamesString.begin();
-        }
-    }
+    int indexRes = getInputIndex(name);
 
     CV_Assert(indexRes != -1 && indexRes < inputCount && inTensorsPtr[indexRes] && "MNN Backend: indexRes error called in setInput()!");
 

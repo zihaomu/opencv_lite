@@ -17,6 +17,10 @@ if(WITH_ORT AND HAVE_ORT)
   ocv_target_compile_definitions(${the_module} PRIVATE "HAVE_ORT=1")
 endif()
 
+if(WITH_TRT AND HAVE_TRT)
+  ocv_target_compile_definitions(${the_module} PRIVATE "HAVE_TRT=1")
+endif()
+
 ocv_cmake_hook_append(INIT_MODULE_SOURCES_opencv_dnn "${CMAKE_CURRENT_LIST_DIR}/cmake/hooks/INIT_MODULE_SOURCES_opencv_dnn.cmake")
 
 if(MSVC)
@@ -106,7 +110,17 @@ if(HAVE_ORT)
   list(APPEND libs ${ORT_SDK_LIB})
 endif()
 
-# Include and line MNN
+# Include and Link TensorRT
+if(HAVE_TRT)
+  message(STATUS "Find TensorRT, and add it to dnn.")
+  message(STATUS "TRT_SDK_INC : ${TRT_SDK_INC}")
+  message(STATUS "TRT_SDK_LIB : ${TRT_SDK_LIB}")
+  message(STATUS "TRT_SDK_LIB_ONNX : ${TRT_SDK_LIB_ONNX}")
+  list(APPEND include_dirs ${TRT_SDK_INC})
+  list(APPEND libs ${TRT_SDK_LIB} ${TRT_SDK_LIB_ONNX} CUDA::cudart CUDA::npps CUDA::nppial CUDA::nppidei)
+endif()
+
+# Include and Link MNN
 if(HAVE_MNN)
   message(STATUS "Find MNN, and add it to dnn.")
   message(STATUS "MNN_INC : ${MNN_INC}")

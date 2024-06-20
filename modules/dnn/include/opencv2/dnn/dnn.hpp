@@ -66,9 +66,9 @@ CV__DNN_INLINE_NS_BEGIN
      */
     enum Precision
     {
-        DNN_PRECISION_NORMAL = 0,
-        DNN_PRECISION_LOW = 1,
-        DNN_PRECISION_HIGH = 2,
+        DNN_PRECISION_NORMAL = 0, // Default
+        DNN_PRECISION_LOW = 1,    // Use all strategies like FP16, Winograd that has some effect on precision.
+        DNN_PRECISION_HIGH = 2,   // Disable all the speed up trick.
     };
 
     /**
@@ -88,16 +88,48 @@ CV__DNN_INLINE_NS_BEGIN
      * @brief Enum of computation backends supported by layers.
      * @see Net::setPreferableBackend
      */
+    // TODO change the backend from cpu or gpu to specific backend.
     enum Backend
     {
-        DNN_BACKEND_CPU = 0, // CPU
-        DNN_BACKEND_GPU = 1, // MNN:OpenCL, tflite:OpenCL, ORT:CUDA, TensorRT:CUDA.
+        DNN_BACKEND_DEFAULT = -1, // Default is cpu, if only gpu was supported like tensorrt backend, then gpu.
+        DNN_BACKEND_CPU = 0,      // CPU
+        DNN_BACKEND_GPU = 1,      // MNN:OpenCL, tflite:OpenCL, ORT:CUDA, TensorRT:CUDA.
     };
 
     //! deprecated. Currently, we only use Backend as target Device.
     enum Target
     {
+        DNN_TARGET_DEFAULT = -1, // Default is cpu, if only gpu was supported like tensorrt backend, then gpu.
         DNN_TARGET_CPU = 0,
+        DNN_TARGET_GPU = 1,
+    };
+
+    struct CV_EXPORTS NetConfig 
+    {
+        int threadNum;
+        Backend backend;
+        Target target;
+        Precision precision;
+
+        NetConfig() : threadNum(4), backend(DNN_BACKEND_DEFAULT), target(DNN_TARGET_DEFAULT), precision(DNN_PRECISION_NORMAL)
+        {}
+    };
+
+    struct CV_EXPORTS NetConfig_TRT : NetConfig
+    {
+        int deviceId;
+        bool useCache;
+        char* cachePath;
+
+        bool useFP16;
+        bool useDLA;
+        bool useTimeCache;
+
+        NetConfig_TRT() :deviceId(0), useCache(false), cachePath(nullptr), useFP16(false), useDLA(false), useTimeCache(true)
+        {}
+
+        // create Trt config by default config.
+        NetConfig_TRT(NetConfig& config);
     };
 
     CV_EXPORTS std::vector< std::pair<Backend, Target> > getAvailableBackends();
@@ -178,18 +210,25 @@ CV__DNN_INLINE_NS_BEGIN
          */
         CV_WRAP void readNet(const char* framework, const char* buffer, size_t sizeBuffer);
 
+        /** @brief Set model config.
+         *  @param config model config information for setting the backend, target, precision 
+         * or other possible info that may be used be specific backend.
+         * @see NetConfig
+         */
+        CV_WRAP void setConfig(NetConfig* config);
+
         /**
          * @brief Ask network to use specific computation backend where it supported.
          * @param[in] backendId backend identifier
          * @see Backend
+         * @deprecated Please use setConfig instead!
          */
         CV_WRAP void setPreferableBackend(int backendId);
 
-
-        /** @deprecated use setPreferableBackend is enough!*/
+        /** @deprecated Please use setConfig instead!*/
         CV_WRAP void setPreferableTarget(int targetId)
         {
-            CV_LOG_WARNING(NULL, "setPreferableTarget is deprecated on opencv lite version, use setPreferableBackend to trigger target device!");
+            CV_LOG_WARNING(NULL, "setPreferableTarget is deprecated on opencv lite version, use setConfig to trigger target device!");
             // do nothing
         }
 
@@ -204,12 +243,14 @@ CV__DNN_INLINE_NS_BEGIN
          * @brief Ask network to use specific computation precision model.
          * @param[in] precisionId precision identifier.
          * @see Precision
+         * @deprecated Please use setConfig instead!
          */
         CV_WRAP void setPreferablePrecision(int precisionId);
 
         /**
          * @brief Ask network to forward model with specific number of threads.
          * @param[in] numThread number of threads.
+         * @deprecated Please use setConfig instead!
          */
         CV_WRAP void setNumThreads(int numThread);
 
@@ -269,18 +310,6 @@ CV__DNN_INLINE_NS_BEGIN
       * arguments does not matter.
       */
      CV_EXPORTS_W Net readNet(const String& model);
-
-//     /**
-//      * @brief Read deep learning network represented in one of the supported formats.
-//      * @details This is an overloaded member function, provided for convenience.
-//      *          It differs from the above function only in what argument(s) it accepts.
-//      * @param[in] framework    Name of origin framework.
-//      * @param[in] bufferModel  A buffer with a content of binary file with weights
-//      * @param[in] bufferConfig A buffer with a content of text file contains network configuration.
-//      * @returns Net object.
-//      */
-//     CV_EXPORTS_W Net readNet(const String& framework, const std::vector<uchar>& bufferModel,
-//                              const std::vector<uchar>& bufferConfig = std::vector<uchar>());
 
     /** @brief Reads a network model <a href="https://onnx.ai/">ONNX</a>.
      *  @param onnxFile path to the .onnx file with text description of the network architecture.
