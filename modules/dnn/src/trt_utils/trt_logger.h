@@ -1,5 +1,7 @@
-#include "NvInferRuntimeCommon.h"
 #include <opencv2/core/utils/logger.hpp>
+
+#ifdef HAVE_TRT
+#include "NvInferRuntimeCommon.h"
 
 namespace cv {
 namespace dnn {
@@ -47,3 +49,5 @@ class TensorrtLogger : public nvinfer1::ILogger {
 }
 CV__DNN_INLINE_NS_END
 }}  //
+
+#endif

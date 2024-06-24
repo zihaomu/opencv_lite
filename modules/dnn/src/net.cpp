@@ -101,6 +101,14 @@ void Net::readNet(const char* _framework, const char* buffer, size_t sizeBuffer)
     }
     else
 #endif
+#ifdef HAVE_TFLITE
+    if (framework == "tflite")
+    {
+        impl = makePtr<dnn_tflite::ImplTflite>();
+        impl->setType(ModelType::DNN_TYPE_TFLITE);
+    }
+    else
+#endif
     CV_Error(Error::StsError, "Cannot determine an origin framework with a name " + framework);
 
     return impl->readNet(buffer, sizeBuffer);
@@ -132,6 +140,14 @@ void Net::readNet(const String& _model)
     if (modelExt == "mnn")
     {
         impl = makePtr<dnn_mnn::ImplMNN>();
+    }
+    else
+#endif
+#ifdef HAVE_TFLITE
+    if (modelExt == "tflite")
+    {
+        impl = makePtr<dnn_tflite::ImplTflite>();
+        impl->setType(ModelType::DNN_TYPE_TFLITE);
     }
     else
 #endif

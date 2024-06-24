@@ -1,5 +1,7 @@
-#include "NvInferRuntimeCommon.h"
 #include <opencv2/core/utils/logger.hpp>
+
+#ifdef HAVE_TRT
+#include "NvInferRuntimeCommon.h"
 
 namespace cv {
 namespace dnn {
@@ -29,3 +31,5 @@ std::string getTimingCachePath(const std::string& root, std::string& compute_cap
 }
 CV__DNN_INLINE_NS_END
 }}  //
+
+#endif
