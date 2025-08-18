@@ -109,15 +109,12 @@ private:
     String instanceName{"opencv-dnn-inference"};
     std::vector<ONNXTensorElementDataType> inDataType;
     std::vector<ONNXTensorElementDataType> outDataType;
-    Ort::Env env;
 
     std::vector<Ort::Value> inputTensors;
-    Ort::AllocatorWithDefaultOptions allocator;
-    // Currently, we only support the ORT CPU backend. TODO! support ORT cuda, and other backend.
-    Ort::MemoryInfo memoryInfo = Ort::MemoryInfo::CreateCpu(
-            OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeDefault);
-    Ort::SessionOptions sessionOptions;// = Ort::SessionOptions{nullptr};
-    Ort::Session session = Ort::Session{nullptr};
+
+    Ptr<Ort::AllocatorWithDefaultOptions> allocator;
+    Ptr<Ort::SessionOptions> sessionOptions;
+    Ptr<Ort::Session> session;
 };
 #endif
 

@@ -1,13 +1,30 @@
-# OpenCV-lite 
-还在开发中。。。
+# OpenCV-lite
 
-OpenCV-lite 是一个轻量化版本的opencv，专注dnn模型部署场景。主要的修改包括：
-- 移除一些不太常用的模块：features2d, flann, gapi, ml, objdetect, stitching, video.
-- 保留dnn模块API，直接使用MNN、ONNXRuntime、Tflite和TensorRT去做相应的模型推理。
+一个轻量版的opencv，专注dnn模型部署场景，并融入mediapipe主要功能，方便用户在各个平台移植。
+本仓库做了哪些工作：
+1. 裁剪opencv，扩展数据类型，增加fp16， int64， bool类型；
+2. 删除opencv dnn自有推理引擎，对接第三方推理引擎，现在已支持：
+    1. onnxruntime，CPU和CUDA GPU
+    2. MNN，CPU
+    3. tflite，CPU和安卓GPU
+ 3. 全套的mediapipe 移植。mediapipe是很棒的项目。
 
-相关项目：
+逐一回答为什么要实现以上几点：
+1. 为什么要裁剪opencv？
+在我从事ai模型部署以来，opencv在这个领域模块的使用频率有限，但是多余的模块会极大的增加编译时间。有些模块引入了下载链接，这也给网络有问题的用户带来了困扰。
 
-OpenCV-lite相比于原始OpenCV的优势：裁剪掉多余模块，减少包体；引入模型格式对应的推理引擎，让对应的推理引擎推理对应的模型结构。
+TODO，给出opencv 完整版本编译时间
+
+2. 为什么要删除原有dnn模块，而引入第三方推理引擎？
+过去三年时间，所接触到的部署平台包括：服务端，pc端和移动端。我发现没有一个推理引擎能够在所有平台所有情况获得最优解。
+MNN作为通用推理框架，基本能够做到在：服务端，pc端和移动端上均衡的性能，不过有个大问题，就是需要将模型格式进行转换，有些模型格式无法转换，就嗝屁了。开发mnn算子的工程量太大，需要了解不少mnn库的知识。
+这时候，加入onnxruntime的支持，也是一个很好的补充，windows，linux，mac都有预编译好的库，用起来很方便。
+为什么需要tflite？在安卓平台上，使用一些比较宽的模型时，使用gpu推理是必须的，目前测试了，只有tflite的opencl速度是最好的，tflite的cpu是被mnn按在地上摩擦的。
+
+tflite，onnxruntime以及mnn的调用api都不算太复杂，不过没学过的同学还是需要一些学习成本的，为了统一一下调用接口，这里将他们映射到了opencv dnn的api中。
+
+3. 为什么需要移植一套mediapipe？
+mediapipe是很棒的项目，但是官方目前的没有想让这个库编程跨平台的想法，而想把这个库做成安卓独占的存在，其他平台的用户想要用mediapipe，是很困难的。mediapipe也算是比较复杂的能力了，正好作为本仓库的一个附加模块。增加一些测试样例。
 
 
 ## 

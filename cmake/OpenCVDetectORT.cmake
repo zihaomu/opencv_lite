@@ -1,6 +1,7 @@
 set(ORT_SDK "" CACHE PATH "ONNXRuntime SDK directory.")
 
 find_library(ORT_SDK_LIB "onnxruntime" PATHS "${ORT_SDK}/lib" NO_DEFAULT_PATH)
+# find_library(ORT_SDK_PROVIDERS_LIB "onnxruntime_providers_shared" PATHS "${ORT_SDK}/lib" NO_DEFAULT_PATH)
 set(ORT_SDK_INC "${ORT_SDK}/include")
 
 if(ORT_SDK_LIB)
