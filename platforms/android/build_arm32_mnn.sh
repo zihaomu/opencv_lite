@@ -2,7 +2,7 @@
 
 # auto compile opencv_lite and MNN
 
-NDK_PATH="/Users/mzh/Library/Android/sdk/ndk/26.1.10909125"
+NDK_PATH="/Users/moo/Library/Android/sdk/ndk/26.1.10909125"
 CMAKE_TOOLCHAIN_PATH="${NDK_PATH}/build/cmake/android.toolchain.cmake"
 
 cmake ../../../ \
@@ -11,10 +11,11 @@ cmake ../../../ \
 -DANDROID_NDK=$NDK_PATH  \
 -DCMAKE_CXX_FLAGS=-std=c++11 \
 -DANDROID_ABI="armeabi-v7a" \
--DTFLITE_LIB=/Users/mzh/work/github/build/build_tflite_android_216_32 \
--DTFLITE_INC=/Users/mzh/work/my_project/opencv_lite_release/android_26/tflite_include \
--DTFLITE_GEMMLOWP_INC=/Users/mzh/work/my_project/opencv_lite_release/android_26/tflite_include/gemmlowp \
+-DTFLITE_LIB=/Volumes/SSD1T/work_ssd/my_project/tflite_cmake_android_26/tflite_216_sdk/arm32 \
+-DTFLITE_INC=/Volumes/SSD1T/work_ssd/my_project/tflite_cmake_android_26/tflite_216_sdk/tflite_include \
+-DTFLITE_GEMMLOWP_INC=/Volumes/SSD1T/work_ssd/my_project/tflite_cmake_android_26/tflite_216_sdk/tflite_include/gemmlowp \
 -DBUILD_PNG=ON \
+-DBUILD_opencv_world=ON \
 -DMNN_OPENCL=ON \
 -DMNN_SUPPORT_BF16=OFF \
 -DANDROID_STL=c++_static \

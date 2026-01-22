@@ -7,7 +7,7 @@
 # NDK_PATH="/Users/mzh/work/read_project/sdk/ndk/21.2.6472646"
 # NDK_PATH="/Users/mzh/work/read_project/sdk/ndk/21.4.7075529"
 # NDK_PATH="/Users/mzh/work/read_project/sdk/ndk/android-ndk-r21e"
-NDK_PATH="/Users/mzh/Library/Android/sdk/ndk/26.1.10909125"
+NDK_PATH="/Users/moo/Library/Android/sdk/ndk/26.1.10909125"
 
 # NDK_PATH="/Users/mzh/Library/Android/sdk/ndk/25.2.9519653"
 CMAKE_TOOLCHAIN_PATH="${NDK_PATH}/build/cmake/android.toolchain.cmake"
@@ -20,10 +20,11 @@ cmake ../../../ \
 -DCMAKE_CXX_FLAGS=-std=c++11 \
 -DANDROID_ABI="arm64-v8a" \
 -DMNN_SUPPORT_BF16=OFF \
--DTFLITE_LIB=/Users/mzh/work/github/build/build_tflite_android_216 \
--DTFLITE_INC=/Users/mzh/work/my_project/opencv_lite_release/android_26/tflite_include \
--DTFLITE_GEMMLOWP_INC=/Users/mzh/work/my_project/opencv_lite_release/android_26/tflite_include/gemmlowp \
+-DTFLITE_LIB=/Volumes/SSD1T/work_ssd/my_project/tflite_cmake_android_26/tflite_216_sdk/arm64 \
+-DTFLITE_INC=/Volumes/SSD1T/work_ssd/my_project/tflite_cmake_android_26/tflite_216_sdk/tflite_include \
+-DTFLITE_GEMMLOWP_INC=/Volumes/SSD1T/work_ssd/my_project/tflite_cmake_android_26/tflite_216_sdk/tflite_include/gemmlowp \
 -DBUILD_PNG=ON \
+-DBUILD_opencv_world=ON \
 -DMNN_ARM82=ON \
 -DMNN_OPENCL=ON \
 -DANDROID_STL=c++_static \
