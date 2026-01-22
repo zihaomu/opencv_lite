@@ -276,7 +276,7 @@ void printMatData(InputArray blob_, int printLen)
         }
         case CV_16F:
         {
-            float16_t *pFloat16 = (float16_t *) blob.data;
+            hfloat* pFloat16 = (hfloat*) blob.data;
             printData(pFloat16, len);
             break;
         }

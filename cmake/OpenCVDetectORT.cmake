@@ -1,6 +1,5 @@
 # Detect ONNXRuntime SDK
-set(ORT_SDK "/Volumes/SSD1T/work_ssd/my_project/mediapipe-lite-project/onnxruntime-osx-arm64-1.23.2")
-# set(ORT_SDK "" CACHE PATH "ONNXRuntime SDK directory.")
+set(ORT_SDK "" CACHE PATH "ONNXRuntime SDK directory.")
 
 find_library(ORT_SDK_LIB "onnxruntime" PATHS "${ORT_SDK}/lib" NO_DEFAULT_PATH)
 # find_library(ORT_SDK_PROVIDERS_LIB "onnxruntime_providers_shared" PATHS "${ORT_SDK}/lib" NO_DEFAULT_PATH)

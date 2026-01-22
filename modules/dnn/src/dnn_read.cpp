@@ -152,12 +152,12 @@ Mat getMatFromTensor(const opencv_onnx::TensorProto& tensor_proto)
 #endif
             const ::google::protobuf::RepeatedField<int32_t> field = tensor_proto.int32_data();
 
-            AutoBuffer<float16_t, 16> aligned_val;
+            AutoBuffer<hfloat, 16> aligned_val;
             size_t sz = tensor_proto.int32_data().size();
             aligned_val.allocate(sz);
-            float16_t* bufPtr = aligned_val.data();
+            hfloat* bufPtr = aligned_val.data();
 
-            float16_t *fp16Ptr = (float16_t *)field.data();
+            hfloat*fp16Ptr = (hfloat*)field.data();
             for (int i = 0; i < sz; i++)
             {
                 bufPtr[i] = fp16Ptr[i*2 + offset];

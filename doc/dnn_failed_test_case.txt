@@ -9,3 +9,9 @@
 
  4 FAILED TESTS
   YOU HAVE 3 DISABLED TESTS
+
+<<<<<<<<<<<<<<<<<<<<< Test On Windows 11, Intel, ORT 1.22 >>>>>>>>>>>>>>>>>>>>>>>>>>>>
+[  PASSED  ] 1052 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] Test_ONNX_conformance.Layer_Test/test_slice_start_out_of_bounds_CPU_CPU, where GetParam() = (test_slice_start_out_of_bounds, CPU/CPU)
+[  FAILED  ] Test_ONNX_conformance.Layer_Test/test_tril_zero_CPU_CPU, where GetParam() = (test_tril_zero, CPU/CPU)
