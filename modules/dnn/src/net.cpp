@@ -82,14 +82,14 @@ void Net::readNet(const char* _framework, const char* buffer, size_t sizeBuffer)
     } else
 #endif
 #ifdef HAVE_TRT
-    else if (framework == "onnx")
+    else if (framework == "trt")
     {
         impl->setType(ModelType::DNN_TYPE_ORT);
         CV_Error(Error::StsError, "read ONNX from buffer is being developed, please contact the developer.");
     } else
 #endif
 #ifdef HAVE_ORT
-    if (framework == "trt")
+    if (framework == "onnx")
     {
         impl->setType(ModelType::DNN_TYPE_TENSORRT);
         CV_Error(Error::StsError, "read TensorRT from buffer is being developed, please contact the developer.");

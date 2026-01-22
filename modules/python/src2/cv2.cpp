@@ -45,6 +45,9 @@ typedef std::vector<DMatch> vector_DMatch;
 typedef std::vector<String> vector_String;
 typedef std::vector<std::string> vector_string;
 typedef std::vector<Scalar> vector_Scalar;
+#ifdef HAVE_OPENCV_OBJDETECT
+typedef std::vector<aruco::Dictionary> vector_Dictionary;
+#endif // HAVE_OPENCV_OBJDETECT
 
 typedef std::vector<std::vector<char> > vector_vector_char;
 typedef std::vector<std::vector<Point> > vector_vector_Point;
@@ -557,6 +560,11 @@ static bool init_body(PyObject * m)
     PUBLISH(CV_64FC2);
     PUBLISH(CV_64FC3);
     PUBLISH(CV_64FC4);
+    PUBLISH(CV_16F);
+    PUBLISH(CV_16FC1);
+    PUBLISH(CV_16FC2);
+    PUBLISH(CV_16FC3);
+    PUBLISH(CV_16FC4);
 #undef PUBLISH_
 #undef PUBLISH
 

@@ -417,7 +417,12 @@ CV__DNN_INLINE_NS_BEGIN
     /** @brief Print the Mat shape.
      * @param[in] blob mutil-dimensional array 1D, 2D, ... data in any data type.
      */
-    CV_EXPORTS_W void printMatShape(InputArray blob);
+    CV_EXPORTS_W void printMatShape(const Mat& blob);
+
+    /** @brief Print the Mat shape.
+     * @param[in] blob mutil-dimensional array 1D, 2D, ... data in any data type.
+     */
+    CV_EXPORTS_W void printMatShape(const MatShape& shape);
 
     /** @brief Print the Mat source data pixcel by pixcel.
      * @param[in] blob mutil-dimensional array 1D, 2D, ... data in any data type.

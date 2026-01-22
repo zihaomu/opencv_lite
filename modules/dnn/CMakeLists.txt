@@ -2,6 +2,7 @@ if(WINRT)
   ocv_module_disable(dnn)
 endif()
 
+# new dnn module no longer depends on protobuf directly
 # if(NOT HAVE_PROTOBUF)
 #   ocv_module_disable(opencv_dnn)
 # endif()

@@ -153,10 +153,8 @@ void imagesFromBlob(const cv::Mat& blob_, OutputArrayOfArrays images_)
     }
 }
 
-void printMatShape(InputArray blob_)
+void printMatShape(const MatShape& shapeData)
 {
-    Mat blob = blob_.getMat();
-    auto shapeData = shape(blob);
     std::cout<<"[";
 
     if (shapeData.size() >= 1)
@@ -170,6 +168,21 @@ void printMatShape(InputArray blob_)
     std::cout<<"]"<<std::endl;
 }
 
+void printMatShape(const Mat& blob)
+{
+    auto shapeData = shape(blob);
+
+    printMatShape(shapeData);
+}
+//
+// void printMatShape(InputArray blob_)
+// {
+//     Mat blob = blob_.getMat();
+//     auto shapeData = shape(blob);
+//
+//     printMatShape(shapeData);
+// }
+
 template<typename T>
 static inline void printData(T* data, const int len)
 {
@@ -180,7 +193,7 @@ static inline void printData(T* data, const int len)
 }
 
 template<>
-static inline void printData(uint8_t * data, const int len)
+inline void printData(uint8_t * data, const int len)
 {
     for (int i = 0; i < len; i++)
     {
@@ -189,7 +202,7 @@ static inline void printData(uint8_t * data, const int len)
 }
 
 template<>
-static inline void printData(int8_t * data, const int len)
+inline void printData(int8_t * data, const int len)
 {
     for (int i = 0; i < len; i++)
     {

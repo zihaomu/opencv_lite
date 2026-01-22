@@ -87,11 +87,11 @@ static bool sumTemplate(InputArray _src, UMat & result)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
-    char cvt[40];
+    char cvt[50];
     ocl::Kernel k("calcSum", ocl::imgproc::match_template_oclsrc,
                   format("-D CALC_SUM -D T=%s -D T1=%s -D WT=%s -D cn=%d -D convertToWT=%s -D WGS=%d -D WGS2_ALIGNED=%d",
                          ocl::typeToStr(type), ocl::typeToStr(depth), ocl::typeToStr(wtype), cn,
-                         ocl::convertTypeStr(depth, wdepth, cn, cvt),
+                         ocl::convertTypeStr(depth, wdepth, cn, cvt, sizeof(cvt)),
                          (int)wgs, wgs2_aligned));
     if (k.empty())
         return false;
@@ -145,7 +145,7 @@ void ConvolveBuf::create(Size image_size, Size templ_size)
     dft_size.width = std::max(getOptimalDFTSize(block_size.width + templ_size.width - 1), 2);
     dft_size.height = getOptimalDFTSize(block_size.height + templ_size.height - 1);
     if( dft_size.width <= 0 || dft_size.height <= 0 )
-        CV_Error( CV_StsOutOfRange, "the input arrays are too big" );
+        CV_Error( cv::Error::StsOutOfRange, "the input arrays are too big" );
 
     // recompute block size
     block_size.width = dft_size.width - templ_size.width + 1;
@@ -268,10 +268,10 @@ static bool matchTemplateNaive_CCORR(InputArray _image, InputArray _templ, Outpu
         wtype1 = CV_MAKE_TYPE(wdepth, rated_cn);
     }
 
-    char cvt[40];
-    char cvt1[40];
-    const char* convertToWT1 = ocl::convertTypeStr(depth, wdepth, cn, cvt);
-    const char* convertToWT = ocl::convertTypeStr(depth, wdepth, rated_cn, cvt1);
+    char cvt[50];
+    char cvt1[50];
+    const char* convertToWT1 = ocl::convertTypeStr(depth, wdepth, cn, cvt, sizeof(cvt));
+    const char* convertToWT = ocl::convertTypeStr(depth, wdepth, rated_cn, cvt1, sizeof(cvt1));
 
     ocl::Kernel k("matchTemplate_Naive_CCORR", ocl::imgproc::match_template_oclsrc,
                   format("-D CCORR -D T=%s -D T1=%s -D WT=%s -D WT1=%s -D convertToWT=%s -D convertToWT1=%s -D cn=%d -D PIX_PER_WI_X=%d", ocl::typeToStr(type), ocl::typeToStr(depth), ocl::typeToStr(wtype1), ocl::typeToStr(wtype),
@@ -349,10 +349,10 @@ static bool matchTemplateNaive_SQDIFF(InputArray _image, InputArray _templ, Outp
     int type = _image.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     int wdepth = CV_32F, wtype = CV_MAKE_TYPE(wdepth, cn);
 
-    char cvt[40];
+    char cvt[50];
     ocl::Kernel k("matchTemplate_Naive_SQDIFF", ocl::imgproc::match_template_oclsrc,
                   format("-D SQDIFF -D T=%s -D T1=%s -D WT=%s -D convertToWT=%s -D cn=%d", ocl::typeToStr(type), ocl::typeToStr(depth),
-                         ocl::typeToStr(wtype), ocl::convertTypeStr(depth, wdepth, cn, cvt), cn));
+                         ocl::typeToStr(wtype), ocl::convertTypeStr(depth, wdepth, cn, cvt, sizeof(cvt)), cn));
     if (k.empty())
         return false;
 
@@ -602,7 +602,7 @@ void crossCorr( const Mat& img, const Mat& _templ, Mat& corr,
     dftsize.width = std::max(getOptimalDFTSize(blocksize.width + templ.cols - 1), 2);
     dftsize.height = getOptimalDFTSize(blocksize.height + templ.rows - 1);
     if( dftsize.width <= 0 || dftsize.height <= 0 )
-        CV_Error( CV_StsOutOfRange, "the input arrays are too big" );
+        CV_Error( cv::Error::StsOutOfRange, "the input arrays are too big" );
 
     // recompute block size
     blocksize.width = dftsize.width - templ.cols + 1;
@@ -779,9 +779,9 @@ static void matchTemplateMask( InputArray _img, InputArray _templ, OutputArray _
     }
     if (mask.depth() == CV_8U)
     {
-        // To keep compatibility to other masks in OpenCV: CV_8U masks are binary masks
-        threshold(mask, mask, 0/*threshold*/, 1.0/*maxVal*/, THRESH_BINARY);
-        mask.convertTo(mask, CV_32F);
+        Mat maskBin;
+        threshold(mask, maskBin, 0/*threshold*/, 1.0/*maxVal*/, THRESH_BINARY);
+        maskBin.convertTo(mask, CV_32F);
     }
 
     Size corrSize(img.cols - templ.cols + 1, img.rows - templ.rows + 1);
@@ -850,7 +850,8 @@ static void matchTemplateMask( InputArray _img, InputArray _templ, OutputArray _
 
         // CCorr(I', T') = CCorr(I, T'*M) - sum(T'*M)/sum(M)*CCorr(I, M)
         // It does not matter what to use Mat/MatExpr, it should be evaluated to perform assign subtraction
-        Mat temp_res = img_mask_corr.mul(sum(templx_mask).div(mask_sum));
+        Mat temp_res;
+        multiply(img_mask_corr, sum(templx_mask).div(mask_sum), temp_res);
         if (img.channels() == 1)
         {
             result -= temp_res;
@@ -881,8 +882,11 @@ static void matchTemplateMask( InputArray _img, InputArray _templ, OutputArray _
             Mat img_mask2_corr(corrSize, img.type());
             crossCorr(img2, mask2, norm_imgx, Point(0,0), 0, 0);
             crossCorr(img, mask2, img_mask2_corr, Point(0,0), 0, 0);
-            temp_res = img_mask_corr.mul(Scalar(1.0, 1.0, 1.0, 1.0).div(mask_sum))
-                           .mul(img_mask_corr.mul(mask2_sum.div(mask_sum)) - 2 * img_mask2_corr);
+            Mat temp_res1;
+            multiply(img_mask_corr, Scalar(1.0, 1.0, 1.0, 1.0).div(mask_sum), temp_res1);
+            Mat temp_res2;
+            multiply(img_mask_corr, mask2_sum.div(mask_sum), temp_res2);
+            temp_res = temp_res1.mul(temp_res2 - 2 * img_mask2_corr);
             if (img.channels() == 1)
             {
                 norm_imgx += temp_res;
@@ -1056,7 +1060,7 @@ static bool ipp_crossCorr(const Mat& src, const Mat& tpl, Mat& dst, bool normed)
     if (ippiCrossCorrNorm==0)
         return false;
 
-    IppEnum funCfg = (IppEnum)(ippAlgAuto | ippiROIValid);
+    IppEnum funCfg = (IppEnum)(+ippAlgAuto | ippiROIValid);
     if(normed)
         funCfg |= ippiNorm;
     else
@@ -1093,7 +1097,7 @@ static bool ipp_sqrDistance(const Mat& src, const Mat& tpl, Mat& dst)
     if (ippiSqrDistanceNorm==0)
         return false;
 
-    IppEnum funCfg = (IppEnum)(ippAlgAuto | ippiROIValid | ippiNormNone);
+    IppEnum funCfg = (IppEnum)(+ippAlgAuto | ippiROIValid | ippiNormNone);
     status = ippiSqrDistanceNormGetBufferSize(srcRoiSize, tplRoiSize, funCfg, &bufSize);
     if ( status < 0 )
         return false;

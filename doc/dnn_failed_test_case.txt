@@ -1,0 +1,11 @@
+<<<<<<<<<<<<<<<<<<<<< Test On Mac M2, ORT 1.23 >>>>>>>>>>>>>>>>>>>>>>>>>>>>
+[==========] 1054 tests from 7 test cases ran. (3140 ms total)
+[  PASSED  ] 1050 tests.
+[  FAILED  ] 4 tests, listed below:
+[  FAILED  ] Test_MNN_nets.MobileNetV2_Tflite_Quantize/0, where GetParam() = CPU/CPU
+[  FAILED  ] Test_MNN_nets.MobileNetV2_Tflite_Quantize_binary/0, where GetParam() = CPU/CPU
+[  FAILED  ] Test_ONNX_conformance.Layer_Test/test_slice_start_out_of_bounds_CPU_CPU, where GetParam() = (test_slice_start_out_of_bounds, CPU/CPU)
+[  FAILED  ] Test_ONNX_conformance.Layer_Test/test_tril_zero_CPU_CPU, where GetParam() = (test_tril_zero, CPU/CPU)
+
+ 4 FAILED TESTS
+  YOU HAVE 3 DISABLED TESTS

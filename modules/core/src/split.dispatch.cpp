@@ -21,13 +21,6 @@ void split8u(const uchar* src, uchar** dst, int len, int cn )
 
 void split16u(const ushort* src, ushort** dst, int len, int cn )
 {
-    v_int32x4 a = {0, 0, 0, 0};
-    v_int32x4 b = {1, 1, 1, 1};
-
-    v_int32x4 c = a + b;
-
-
-
     CV_INSTRUMENT_REGION();
     CALL_HAL(split16u, cv_hal_split16u, src,dst, len, cn)
     CV_CPU_DISPATCH(split16u, (src, dst, len, cn),
@@ -60,7 +53,7 @@ typedef void (*SplitFunc)(const uchar* src, uchar** dst, int len, int cn);
 
 static SplitFunc getSplitFunc(int depth)
 {
-    static SplitFunc splitTab[] =
+    static SplitFunc splitTab[CV_DEPTH_MAX] =
     {
         (SplitFunc)GET_OPTIMIZED(cv::hal::split8u), (SplitFunc)GET_OPTIMIZED(cv::hal::split8u),
         (SplitFunc)GET_OPTIMIZED(cv::hal::split16u), (SplitFunc)GET_OPTIMIZED(cv::hal::split16u),

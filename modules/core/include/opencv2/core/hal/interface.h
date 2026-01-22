@@ -82,8 +82,6 @@ typedef signed char schar;
 #define CV_64U  9
 #define CV_BOOL 10
 #define CV_32U  11
-//#define CV_16BF 12 // TODO! support the BF 16 data
-// #define CV_STRING  13 // TODO! support STRING data.
 
 #define CV_MAT_DEPTH_MASK       (CV_DEPTH_MAX - 1)
 #define CV_MAT_DEPTH(flags)     ((flags) & CV_MAT_DEPTH_MASK)
@@ -121,12 +119,6 @@ typedef signed char schar;
 #define CV_32SC4 CV_MAKETYPE(CV_32S,4)
 #define CV_32SC(n) CV_MAKETYPE(CV_32S,(n))
 
-#define CV_32UC1 CV_MAKETYPE(CV_32U,1)
-#define CV_32UC2 CV_MAKETYPE(CV_32U,2)
-#define CV_32UC3 CV_MAKETYPE(CV_32U,3)
-#define CV_32UC4 CV_MAKETYPE(CV_32U,4)
-#define CV_32UC(n) CV_MAKETYPE(CV_32U,(n))
-
 #define CV_32FC1 CV_MAKETYPE(CV_32F,1)
 #define CV_32FC2 CV_MAKETYPE(CV_32F,2)
 #define CV_32FC3 CV_MAKETYPE(CV_32F,3)
@@ -162,6 +154,13 @@ typedef signed char schar;
 #define CV_BOOLC3 CV_MAKETYPE(CV_BOOL,3)
 #define CV_BOOLC4 CV_MAKETYPE(CV_BOOL,4)
 #define CV_BOOLC(n) CV_MAKETYPE(CV_BOOL,(n))
+
+#define CV_32UC1 CV_MAKETYPE(CV_32U,1)
+#define CV_32UC2 CV_MAKETYPE(CV_32U,2)
+#define CV_32UC3 CV_MAKETYPE(CV_32U,3)
+#define CV_32UC4 CV_MAKETYPE(CV_32U,4)
+#define CV_32UC(n) CV_MAKETYPE(CV_32U,(n))
+
 //! @}
 
 //! @name Comparison operation

@@ -13,6 +13,11 @@ namespace cv {
 namespace dnn {
 CV__DNN_INLINE_NS_BEGIN
 
+static Ort::Env& GetOrtEnv() {
+    static Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "opencv-dnn-inference");
+    return env;
+}
+
 // function convert ONNX Tensor to Mat.
 static void MatShapeToInt64(const MatShape& inShape, std::vector<int64>& outShape)
 {
@@ -169,8 +174,11 @@ ImplORT::~ImplORT()
 
 ImplORT::ImplORT()
 {
+    Ort::Env& env = GetOrtEnv();
     // ONNXRuntime
-    sessionOptions.SetIntraOpNumThreads(thread_num);
+    sessionOptions = std::make_shared<Ort::SessionOptions>();
+    sessionOptions->SetIntraOpNumThreads(thread_num);
+    allocator = std::make_shared<Ort::AllocatorWithDefaultOptions>();
 }
 
 void ImplORT::setNumThreads(int num)
@@ -182,30 +190,30 @@ void ImplORT::setNumThreads(int num)
     }
 
     thread_num = num;
-    sessionOptions.SetIntraOpNumThreads(thread_num);
+    sessionOptions->SetIntraOpNumThreads(thread_num);
 }
 
 // TODO, Since TensorRT can support ONNX, we need add the flag for switching ONNX to ORT and TensorRT backend.
 void ImplORT::readNet(const String& model)
 {
-    env = Ort::Env(OrtLoggingLevel::ORT_LOGGING_LEVEL_WARNING, instanceName.c_str());
+    Ort::Env& env = GetOrtEnv(); // Ensure the Ort::Env is initialized.
 #ifdef _WIN32
     std::wstring wModel_path(model.begin(), model.end());
-    session = Ort::Session(env, wModel_path.c_str(), sessionOptions);
+    session = std::make_shared<Ort::Session>(env, wModel_path.c_str(), *sessionOptions);
 #else
-    session = Ort::Session(env, model.c_str(), sessionOptions);
+    session = std::make_shared<Ort::Session>(env, model.c_str(), *sessionOptions);
 #endif
 
-    inputCount = session.GetInputCount();
-    outputCount = session.GetOutputCount();
+    inputCount = session->GetInputCount();
+    outputCount = session->GetOutputCount();
 
     // TODO: check if we need the following code?
     for (int i = 0; i < inputCount; i++)
     {
-        auto tmp_name = session.GetInputNameAllocated(i, allocator);
+        auto tmp_name = session->GetInputNameAllocated(i, *allocator);
         inputNamesString.push_back(tmp_name.get());
 
-        Ort::TypeInfo inpInfor = session.GetInputTypeInfo(i);
+        Ort::TypeInfo inpInfor = session->GetInputTypeInfo(i);
         auto tAndS = inpInfor.GetTensorTypeAndShapeInfo();
 
         inDataType.push_back(tAndS.GetElementType());
@@ -221,10 +229,10 @@ void ImplORT::readNet(const String& model)
 
     for (int i = 0; i < outputCount; i++)
     {
-        auto tmp_name = session.GetOutputNameAllocated(i, allocator);
+        auto tmp_name = session->GetOutputNameAllocated(i, *allocator);
         outputNamesString.push_back(tmp_name.get());
 
-        Ort::TypeInfo outInfor = session.GetOutputTypeInfo(i);
+        Ort::TypeInfo outInfor = session->GetOutputTypeInfo(i);
         auto tAndS = outInfor.GetTensorTypeAndShapeInfo();
 
         outDataType.push_back(tAndS.GetElementType());
@@ -259,7 +267,7 @@ void ImplORT::forward(OutputArrayOfArrays outputBlobs, const std::vector<String>
         outputNames.push_back(outBlobNames[i].c_str());
     }
 
-    std::vector<Ort::Value> outputTensors = session.Run(Ort::RunOptions{nullptr}, inputNames.data(), inputTensors.data(),
+    std::vector<Ort::Value> outputTensors = session->Run(Ort::RunOptions{nullptr}, inputNames.data(), inputTensors.data(),
                                                         inputTensors.size(), outputNames.data(), outputNames.size());
 
     tensors2Mats(outputTensors, outputvec);
@@ -362,6 +370,7 @@ static inline int totalInt64(const std::vector<int64_t>& int64Shape)
 // TODO: add new function, and let this function works on different backend.
 void ImplORT::setInput(InputArray blob_, const String& name)
 {
+    Ort::MemoryInfo memoryInfo = Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeDefault);
     Mat blob = blob_.getMat();
 
     int index = -1, indexRes = -1;

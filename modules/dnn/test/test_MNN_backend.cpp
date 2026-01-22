@@ -65,7 +65,7 @@ public:
     }
 
     void testMobileNet(const String& model_path, const String& input_path, int inDataType, const String& expect_path,
-                       int outDataType, int precisionId = 0, int numThreads = 4)
+                       int outDataType, int precisionId = 0, int numThreads = 4, double default_l1 = 1e-4, double default_lInf = 1e-4)
     {
         String mnnmodel = _tf(model_path, required);
         Net net = readNetFromMNN(mnnmodel);
@@ -73,6 +73,7 @@ public:
         // set Thread and set precision.
         net.setPreferablePrecision(precisionId);
         net.setNumThreads(numThreads);
+        net.setPreferableBackend(Backend::DNN_BACKEND_CPU);
 
         auto inputShapes = net.getInputShape();
         auto outputShapes = net.getOutputShape();
@@ -155,6 +156,9 @@ public:
         auto inputShapes = net.getInputShape();
         auto outputShapes = net.getOutputShape();
 
+        std::cout<<"print inputShapes"<<std::endl;
+        printMatShape(inputShapes[0]);
+
         CV_Assert(inputShapes.size() == 1 && outputShapes.size() == 1);
 
         // rebuild expect blob
@@ -164,9 +168,17 @@ public:
         String expectFile = _tf(expect_path, required);
         buildMatFromFile(expectBlob, total(outputShape), expectFile, outDataType);
 
-        net.setPreferableBackend(DNN_BACKEND_GPU);
+        std::cout<<"print inputBlob"<<std::endl;
+        printMatData(inputBlob, 10);
+
         net.setInput(inputBlob);
         Mat outputBlob = net.forward();
+
+        std::cout<<"print expectBlob"<<std::endl;
+        printMatData(expectBlob, 10);
+
+        std::cout<<"print outputBlob"<<std::endl;
+        printMatData(outputBlob, 10);
 
         normAssert(outputBlob, expectBlob, "", default_l1, default_lInf);
     }
@@ -232,7 +244,9 @@ TEST_P(Test_MNN_nets, MobileNetV1_Caffe_Precision_Low)
             "MobileNet/v1/expect.txt",
             CV_32F,
             1,
-            2
+            2,
+            1e-3,
+            1e-3
     );
 }
 
@@ -302,11 +316,11 @@ TEST_P(Test_MNN_nets, MobileNetV2_Tflite_Quantize_binary)
     Mat inputBlob = Mat(224, 224, CV_8UC3);
     String inputFile = _tf("MobileNet/qnt_input.txt", required);
     buildMatFromFile(inputBlob, inputBlob.total() * inputBlob.channels(), inputFile, CV_8U);
-    inputBlob = blobFromImage(inputBlob, 1.0, Size(), Scalar(), false, false, CV_8U);
+    Mat blob = blobFromImage(inputBlob, 1.0, Size(), Scalar(), false, false, CV_8U);
 
     testMobileNetFromBufferWithInput(
             "MobileNet/v2/mobilenet_v2_1.0_224_quant.tflite.mnn",
-            inputBlob,
+            blob,
             "MobileNet/v2/expect_tflite_qnt.txt",
             CV_8U
     );

@@ -1078,12 +1078,6 @@ TEST_P(Test_ONNX_conformance, Layer_Test)
         {
             if (ref_outputs.size() == 1)
             {
-                // probably we found random unconnected layers.
-                // TODEL
-                auto a = shape(ref_outputs[0]);
-                auto b = shape(outputs[0]);
-                auto aa = ref_outputs[0].type();
-                auto ab = outputs[0].type();
                 normAssert(ref_outputs[0], outputs[0], "", default_l1, default_lInf);
             }
             else
