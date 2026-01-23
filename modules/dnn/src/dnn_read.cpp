@@ -169,11 +169,11 @@ Mat getMatFromTensor(const opencv_onnx::TensorProto& tensor_proto)
             char* val = const_cast<char*>(tensor_proto.raw_data().c_str());
 #if CV_STRONG_ALIGNMENT
             // Aligned pointer is required.
-            AutoBuffer<float16_t, 16> aligned_val;
-            if (!isAligned<sizeof(float16_t)>(val))
+            AutoBuffer<hfloat, 16> aligned_val;
+            if (!isAligned<sizeof(hfloat)>(val))
             {
                 size_t sz = tensor_proto.raw_data().size();
-                aligned_val.allocate(divUp(sz, sizeof(float16_t)));
+                aligned_val.allocate(divUp(sz, sizeof(hfloat)));
                 memcpy(aligned_val.data(), val, sz);
                 val = (char*)aligned_val.data();
             }

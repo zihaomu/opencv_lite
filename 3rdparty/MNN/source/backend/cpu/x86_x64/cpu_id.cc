@@ -21,6 +21,7 @@
 
 // For ArmCpuCaps() but unittested on all platforms
 #include <stdio.h>
+#include <cstdint>
 #include <string.h>
 
 #ifdef __cplusplus

@@ -1,5 +1,10 @@
 # OpenCV-lite
 
+TODO:
+- Fix OpenCV-Python api
+- Fix mnn quant error at m1
+- Fix ORT backend issue cases at '/doc/dnn_failed_test_case.txt'
+
 一个轻量版的opencv，专注dnn模型部署场景，并融入mediapipe主要功能，方便用户在各个平台移植。
 本仓库做了哪些工作：
 1. 裁剪opencv，扩展数据类型，增加fp16， int64， bool类型；
