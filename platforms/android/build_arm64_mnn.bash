@@ -1,12 +1,4 @@
 #!/bin/bash
-
-# auto compile opencv_lite and MNN
-# make -j4
-# sed -i -e '/^  -g$/d' ./android-legacy.toolchain.cmake
-# /Users/mzh/work/read_project/sdk/ndk/21.2.6472646/build/cmake/android.toolchain.cmake
-# NDK_PATH="/Users/mzh/work/read_project/sdk/ndk/21.2.6472646"
-# NDK_PATH="/Users/mzh/work/read_project/sdk/ndk/21.4.7075529"
-# NDK_PATH="/Users/mzh/work/read_project/sdk/ndk/android-ndk-r21e"
 NDK_PATH="/Users/mzh/Library/Android/sdk/ndk/26.1.10909125"
 
 # NDK_PATH="/Users/mzh/Library/Android/sdk/ndk/25.2.9519653"

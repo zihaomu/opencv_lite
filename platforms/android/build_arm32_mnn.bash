@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # auto compile opencv_lite and MN
+# set your NDK path
 NDK_PATH="/Users/mzh/Library/Android/sdk/ndk/26.1.10909125"
 CMAKE_TOOLCHAIN_PATH="${NDK_PATH}/build/cmake/android.toolchain.cmake"
 
